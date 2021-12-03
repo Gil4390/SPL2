@@ -27,11 +27,12 @@ public class MessageBusImpl implements MessageBus {
 
 	ConferenceService conference;
 
+	HashMap<Event,Pair<Future, StudentService>> event_Futures;
+
 
 	/**
-	 * @param type the event type
-	 * @param m the microService that want to subscribe to the event
-	 * @post
+	 * @pre  this.isSubscribed(m,type) == false;
+	 * @post this.isSubscribed(m,type) == true;
 	 */
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
@@ -39,49 +40,79 @@ public class MessageBusImpl implements MessageBus {
 
 	}
 
+	/**
+	 * @pre  this.isSubscribed(m,type) == false;
+	 * @post this.isSubscribed(m,type) == true;
+	 */
 	@Override
 	public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/**
+	 * @pre e.result != null ;
+	 * @post event_Futures.getValue(e).first.isDone = true;
+	 * @post result = event_Futures.getValue(e).first.result();
+	 */
 	@Override
 	public <T> void complete(Event<T> e, T result) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/**
+	 * @post //TODO
+	 */
 	@Override
 	public void sendBroadcast(Broadcast b) {
 		// TODO Auto-generated method stub
 
 	}
 
-	
+	/**
+	 */
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/**
+	 * @pre  this.isRegistered(m) == false;
+	 * @post this.isRegistered(m) == true;
+	 */
 	@Override
 	public void register(MicroService m) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/**
+	 * @pre  this.isRegistered(m) == true;
+	 * @post this.isRegistered(m) == false;
+	 */
 	@Override
 	public void unregister(MicroService m) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/**
+	 * @pre  this.isRegistered(m) == true;
+	 * @post this.queue.size() = @pre this.queue.size()-1
+	 */
 	@Override
 	public Message awaitMessage(MicroService m) throws InterruptedException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	
+	private boolean isSubscribed(MicroService s, Message m){
+		return false;
+	}
 
+	private boolean isRegistered(MicroService s){
+		return false;
+	}
 }
