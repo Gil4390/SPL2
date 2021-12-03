@@ -20,24 +20,28 @@ public class GPU {
     private DataBatch[] processedDataBatch;
     private DataBatch[] unProcessedDataBatch;
     private int indexPDB;
+    GPUService gpuService;
 
-    public GPU(Type type){
+    public GPU(Type type,Cluster cluster){
         this.type=type;
         switch(type){
             case GTX1080: processedDataBatch = new DataBatch[8];
             case RTX2080: processedDataBatch = new DataBatch[16];
             case RTX3090: processedDataBatch = new DataBatch[32];
         }
+        this.cluster = cluster;
         model = null;
         indexPDB = 0;
     }
 
-    public void Initialize(Cluster cluster){
-        this.cluster = cluster;
+    public void Initialize(GPUService gpuService)
+    {
+        this.gpuService=gpuService;
     }
 
     public void ReciveEvent(Model model){
         this.model = model;
+        //initalize DataBatch
     }
 
     private void TrainModel(){

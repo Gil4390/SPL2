@@ -1,4 +1,4 @@
-package bgu.spl.mics.example.messages;
+package bgu.spl.mics.application.services.messages;
 
 import bgu.spl.mics.Event;
 

@@ -1,7 +1,7 @@
 package bgu.spl.mics.example.services;
 
 import bgu.spl.mics.MicroService;
-import bgu.spl.mics.example.messages.ExampleBroadcast;
+import bgu.spl.mics.application.services.messages.ExampleBroadcast;
 
 public class ExampleBroadcastListenerService extends MicroService {
 

@@ -17,8 +17,9 @@ public class Future<T> {
 	/**
 	 * This should be the only public constructor in this class.
 	 */
-	public Future() {
+	public Future(T result) {
 		//TODO: implement this
+		this.result=result;
 		done = false;
 	}
 	
@@ -32,7 +33,10 @@ public class Future<T> {
      */
 	public T get() {
 		//TODO: implement this.
-		return null;
+		if(done)
+			return result;
+		//wait until done to be true
+		return result;
 	}
 	
 	/**
@@ -40,9 +44,7 @@ public class Future<T> {
      */
 	public void resolve (T result) {
 		//TODO: implement this.
-
-
-
+		//need to comutation
 		done = true;
 	}
 	
@@ -51,7 +53,7 @@ public class Future<T> {
      */
 	public boolean isDone() {
 		//TODO: implement this.
-		return false;
+		return done;
 	}
 	
 	/**
@@ -67,6 +69,13 @@ public class Future<T> {
      */
 	public T get(long timeout, TimeUnit unit) {
 		//TODO: implement this.
+		if(done)
+			return result;
+		else{
+			//unit.sleep(timeout);
+			if(done)
+				return result;
+		}
 		return null;
 	}
 
