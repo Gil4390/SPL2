@@ -6,5 +6,9 @@ package bgu.spl.mics.application.objects;
  */
 
 public class DataBatch {
-    
+    private int processedTime;
+
+    public int getProcessedTime(){
+        return processedTime;
+    }
 }

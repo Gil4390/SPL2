@@ -1,6 +1,11 @@
 package bgu.spl.mics.application.objects;
 
+import Callbacks.Gpu_Callback;
 import bgu.spl.mics.application.services.GPUService;
+import jdk.javadoc.internal.doclets.toolkit.util.Utils;
+
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * Passive object representing a single GPU.
@@ -17,42 +22,68 @@ public class GPU {
     private Model model;
     private Cluster cluster;
 
-    private DataBatch[] processedDataBatch;
+    private Queue <Utils.Pair<Integer,DataBatch>> processingDataBatch;
+
     private DataBatch[] unProcessedDataBatch;
-    private int indexPDB;
-    GPUService gpuService;
+    private Gpu_Callback callback;
+
+    private int indexUPDB;
+    private int countPDB;
+    private int capacity;
+    private int timeClock;
+    private int trainingTime;
 
     public GPU(Type type,Cluster cluster){
         this.type=type;
         switch(type){
-            case GTX1080: processedDataBatch = new DataBatch[8];
-            case RTX2080: processedDataBatch = new DataBatch[16];
-            case RTX3090: processedDataBatch = new DataBatch[32];
+            case GTX1080: {capacity = 8; trainingTime=4;}
+            case RTX2080: {capacity = 16; trainingTime=2;}
+            case RTX3090: {capacity = 32; trainingTime=1;}
         }
+        processingDataBatch= new PriorityQueue<Utils.Pair<Integer,DataBatch>>();
         this.cluster = cluster;
+        countPDB=0;
         model = null;
-        indexPDB = 0;
+        indexUPDB = 0;
+        timeClock=0;
     }
 
-    public void Initialize(GPUService gpuService)
+    public void tick(){
+        timeClock++;
+    }
+
+    public void Initialize(Gpu_Callback callback)
     {
-        this.gpuService=gpuService;
+        this.callback=callback;
     }
 
-    public void ReciveEvent(Model model){
+    public void ReciveModel(Model model){
         this.model = model;
-        //initalize DataBatch
+        DivideDataBatch();
     }
 
     private void TrainModel(){
-
+        sendDataBatch();
+        //callback.call();
     }
 
     private void DivideDataBatch(){
+        /*
+        Data data = model.getData();
+        unProcessedDataBatch = new unProcessedDataBatch[];
+        for(0....data/1000)
+            new databatch
+        unProcessedDataBatch[i]=datacath;
+        */
+        sendDataBatch();
+    }
+
+    private void sendDataBatch(){
 
     }
 
     public void ReciveProcessedData(DataBatch databatch){
+
 
     }
 }

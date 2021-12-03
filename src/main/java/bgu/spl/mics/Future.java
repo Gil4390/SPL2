@@ -22,7 +22,7 @@ public class Future<T> {
 		this.result=result;
 		done = false;
 	}
-	
+
 	/**
      * retrieves the result the Future object holds if it has been resolved.
      * This is a blocking method! It waits for the computation in case it has
