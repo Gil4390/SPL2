@@ -3,7 +3,6 @@ package bgu.spl.mics;
 import bgu.spl.mics.application.services.ConferenceService;
 import bgu.spl.mics.application.services.StudentService;
 import bgu.spl.mics.application.services.TimeService;
-import com.sun.tools.javac.util.Pair;
 
 import java.util.*;
 
@@ -13,10 +12,10 @@ import java.util.*;
  * Only private fields and methods can be added to this class.
  */
 public class MessageBusImpl implements MessageBus {
-	HashMap <String, Pair<MicroService,Queue<Event>>>GPU_TrainModel;
+	HashMap<MicroService, Queue<Event>> GPU_TrainModel;
 	int GPU_TrainModel_Index;
 
-	HashMap <String, Pair<MicroService,Queue<Event>>>GPU_TestModel;
+	HashMap<MicroService, Queue<Event>> GPU_TestModel;
 	int GPU_TestModel_Index;
 
 	Stack<StudentService> Students;
@@ -26,8 +25,6 @@ public class MessageBusImpl implements MessageBus {
 	TimeService timeService;
 
 	ConferenceService conference;
-
-	HashMap<Event,Pair<Future, StudentService>> event_Futures;
 
 
 	/**
@@ -52,8 +49,8 @@ public class MessageBusImpl implements MessageBus {
 
 	/**
 	 * @pre e.result != null ;
-	 * @post event_Futures.getValue(e).first.isDone = true;
-	 * @post result = event_Futures.getValue(e).first.result();
+	 * @post e.future.isDone = true;
+	 * @post result = e.future.get();
 	 */
 	@Override
 	public <T> void complete(Event<T> e, T result) {
@@ -62,7 +59,8 @@ public class MessageBusImpl implements MessageBus {
 	}
 
 	/**
-	 * @post //TODO
+	 * @pre //TODO
+	 * @post
 	 */
 	@Override
 	public void sendBroadcast(Broadcast b) {
@@ -114,5 +112,9 @@ public class MessageBusImpl implements MessageBus {
 
 	private boolean isRegistered(MicroService s){
 		return false;
+	}
+
+	private MicroService getNextMicroService(Message m){
+		return null;
 	}
 }

@@ -1,11 +1,7 @@
 package bgu.spl.mics.application.objects;
 
 import Callbacks.Gpu_Callback;
-import bgu.spl.mics.application.services.GPUService;
-import jdk.javadoc.internal.doclets.toolkit.util.Utils;
-
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Passive object representing a single GPU.
@@ -22,7 +18,7 @@ public class GPU {
     private Model model;
     private Cluster cluster;
 
-    private Queue <Utils.Pair<Integer,DataBatch>> processingDataBatch;
+    private Queue<DataBatch> processingDataBatch;
 
     private DataBatch[] unProcessedDataBatch;
     private Gpu_Callback callback;
@@ -40,7 +36,7 @@ public class GPU {
             case RTX2080: {capacity = 16; trainingTime=2;}
             case RTX3090: {capacity = 32; trainingTime=1;}
         }
-        processingDataBatch= new PriorityQueue<Utils.Pair<Integer,DataBatch>>();
+        processingDataBatch= new PriorityQueue<DataBatch>();
         this.cluster = cluster;
         countPDB=0;
         model = null;

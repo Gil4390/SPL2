@@ -6,9 +6,22 @@ package bgu.spl.mics.application.objects;
  */
 
 public class DataBatch {
-    private int processedTime;
+    private int processTime;
+    private int startTick;
 
-    public int getProcessedTime(){
-        return processedTime;
+    public DataBatch() {
+
+    }
+
+    public int getProcessTime(){
+        return processTime;
+    }
+
+    public int getStartTick() {
+        return startTick;
+    }
+
+    public void setStartTick(int startTick) {
+        this.startTick = startTick;
     }
 }
