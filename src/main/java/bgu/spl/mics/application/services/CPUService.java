@@ -19,7 +19,7 @@ public class CPUService extends MicroService {
         this.cpu=cpu;
     }
 
-    public void tick(){cpu.tick();}
+    public void tick(){cpu.tickAndCompute();}
 
     @Override
     protected void initialize() {

@@ -63,7 +63,6 @@ public class GPU {
     }
 
     private void TrainModel(){
-        sendDataBatch();
         //callback.call();
     }
 
@@ -81,6 +80,7 @@ public class GPU {
     private void sendDataBatch(){
 
     }
+
 
     public void ReciveProcessedData(DataBatch databatch){
 

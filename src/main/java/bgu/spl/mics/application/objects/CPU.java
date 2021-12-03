@@ -24,20 +24,28 @@ public class CPU {
         processedTime=0;
     }
 
-    public void Initialize(){}
-
+    /**
+     * @param databatch the databatch from the cluster
+     * @pre this.ready = true
+     * @inv: this.cores == this.cores@pre, this.cluster == this.cluster@pre
+     * @post this.databatch != null
+     * @post this.endProcessedTime=@pre(processedTime)+(32/@pre(cores))*databatch.getProcessedTime()
+     */
     public void ReciveUnProcessedData(DataBatch databatch){
         this.databatch=databatch;
         ready=false;
         endProcessedTime=processedTime+(32/cores)*databatch.getProcessedTime();
     }
 
-    public void tick(){
+    /**
+     * @inv: this.cores == this.cores@pre
+     * @inv: this.cluster == this.cluster@pre
+     * @post this.processedTime == @prethis.processedTime+1
+     * @post this.processedTime <= @pre(endProcessedTime) | @post(endProcessedTime) == 0
+     * @post this.databatch == @pre(databatch) | @post(databatch) == null
+     */
+    public void tickAndCompute(){
         processedTime++;
-        compute();
-    }
-
-    public void compute(){
         if(!ready & processedTime==endProcessedTime){
             //cluster.rec(databatch);
             endProcessedTime=0;
