@@ -1,6 +1,8 @@
 package bgu.spl.mics.application.objects;
 
 
+import java.util.PriorityQueue;
+
 /**
  * Passive object representing the cluster.
  * <p>
@@ -11,6 +13,13 @@ package bgu.spl.mics.application.objects;
 public class Cluster {
 
 
+	private PriorityQueue<CPU> CPUs;
+	private PriorityQueue<GPU> GPUs;
+	private String statistics; //TODO: decide what Data structure will hold it
+
+	private Cluster(){
+
+	}
 	/**
      * Retrieves the single instance of this class.
      */
