@@ -16,30 +16,30 @@ class CPUTest {
 
     @Test
     void receiveUnProcessedData() {
-        assertNull(cpu.databatch);
+        assertNull(cpu.getDataBatch());
         DataBatch data = new DataBatch();
         cpu.ReceiveUnProcessedData(data);
-        assertEquals(cpu.databatch, data);
+        assertEquals(cpu.getDataBatch(), data);
     }
 
     @Test
     void tickAndCompute() {
 
-        for (int i = 0; i < cpu.endProcessedTime; i++) {
-            int time = cpu.processedTime;
+        for (int i = 0; i < cpu.getEndProcessedTime(); i++) {
+            int time = cpu.getProcessedTime();
             cpu.tickAndCompute();
-            assertEquals(time+1, cpu.processedTime);
+            assertEquals(time+1, cpu.getProcessedTime());
             assertFalse(cpu.isReady());
         }
         assertTrue(cpu.isReady());
-        assertNull(cpu.databatch);
-        assertEquals(0, cpu.endProcessedTime);
+        assertNull(cpu.getDataBatch());
+        assertEquals(0, cpu.getEndProcessedTime());
 
     }
 
     @Test
     void isReady() {
-        if(cpu.databatch == null){
+        if(cpu.getDataBatch()== null){
             assertFalse(cpu.isReady());
         }
         else{

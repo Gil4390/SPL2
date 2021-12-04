@@ -29,9 +29,6 @@ public class Future<T> {
      * not been completed.
      * <p>
      * @return return the result of type T if it is available, if not wait until it is available.
-     *
-	 * @inv this.result = @pre this.result;
-	 * @inv this.done = @pre this.done;
      */
 	public T get() {
 		//TODO: implement this.
@@ -43,6 +40,8 @@ public class Future<T> {
 	
 	/**
      * Resolves the result of this Future object.
+	 * <p>
+	 * @param result the result the future needs to hold
 	 * @pre this.done = false;
 	 * @pre this.result = null;
 	 * @post this.done = true;
@@ -56,7 +55,6 @@ public class Future<T> {
 	
 	/**
      * @return true if this object has been resolved, false otherwise
-	 * @inv this.done = @pre this.done;
      */
 	public boolean isDone() {
 		//TODO: implement this.
