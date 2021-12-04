@@ -15,6 +15,9 @@ public class Cluster {
 
 	private PriorityQueue<CPU> CPUs;
 	private PriorityQueue<GPU> GPUs;
+
+	private PriorityQueue<DataBatch> dataBATCH_ForCPU;
+	private PriorityQueue<DataBatch> dataBATCH_ForGPU;
 	private String statistics; //TODO: decide what Data structure will hold it
 
 	private Cluster(){
@@ -28,4 +31,7 @@ public class Cluster {
 		return null;
 	}
 
+	public PriorityQueue<DataBatch> getDataBATCH_ForCPU() {
+		return dataBATCH_ForCPU;
+	}
 }

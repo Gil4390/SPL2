@@ -25,8 +25,6 @@ public class GPU {
 
     private DataBatch[] unProcessedDataBatch;
 
-    private Gpu_Callback callback;
-
     private int indexUPDB;
     private int countPDB;
     private int capacity;
@@ -36,7 +34,7 @@ public class GPU {
     private boolean ready;
 
     public GPU(String type,Cluster cluster){
-        this.type=fromStringToType(type);
+        this.type=FromStringToType(type);
         switch(type){
             case "GTX1080": {capacity = 8; trainingTime=4;}
             case "RTX2080": {capacity = 16; trainingTime=2;}
@@ -91,7 +89,7 @@ public class GPU {
      * @post this.countPDB ==0
      * @post this.trainingTime =0;
      */
-    private void finish(){
+    public void Finish(){
         //callback.call();
     }
 
@@ -121,7 +119,7 @@ public class GPU {
      * @pre unProcessedDataBatch.size()-1 > indexUPDB
      * @post this.indexUPDB >= @pre(indexUPDB)
      */
-    public void sendDataBatch(){
+    public void SendDataBatch(){
 
     }
 
@@ -140,7 +138,7 @@ public class GPU {
      * <p>
      * @param type the type
      */
-    private Type fromStringToType(String type){
+    private Type FromStringToType(String type){
         switch (type) {
             case ("RTX3090"):
                 return Type.RTX3090;
@@ -193,15 +191,15 @@ public class GPU {
         return ready;
     }
 
-    public Gpu_Callback getCallback() {
-        return callback;
-    }
-
     public Model getModel() {
         return model;
     }
 
     public Queue<DataBatch> getProcessingDataBatch() {
         return processingDataBatch;
+    }
+
+    public DataBatch[] getUnProcessedDataBatch() {
+        return unProcessedDataBatch;
     }
 }

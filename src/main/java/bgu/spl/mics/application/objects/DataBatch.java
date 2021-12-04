@@ -8,8 +8,10 @@ package bgu.spl.mics.application.objects;
 public class DataBatch {
     private int processTime;
     private int startTick;
+    private int index;
+    Data data;
 
-    public DataBatch() {
+    public DataBatch(int index,Data data) {
 
     }
 

@@ -18,4 +18,24 @@ public class Student {
     private int publications;
     private int papersRead;
 
+    public Student(String name, String department, String degree){
+
+    }
+
+    /**
+     * @return the Type by the string type
+     * <p>
+     * @param type the type
+     */
+    private Student.Degree FromStringToType(String type){
+        switch (type) {
+            case ("MSc"):
+                return Student.Degree.MSc;
+            case ("PhD"):
+                return Student.Degree.PhD;
+            default:
+                return null;
+        }
+    }
+
 }
