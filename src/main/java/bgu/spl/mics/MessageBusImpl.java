@@ -12,19 +12,19 @@ import java.util.*;
  * Only private fields and methods can be added to this class.
  */
 public class MessageBusImpl implements MessageBus {
-	HashMap<MicroService, Queue<Event>> GPU_TrainModel;
-	int GPU_TrainModel_Index;
+	private HashMap<MicroService, Queue<Event>> GPU_TrainModel;
+	private int GPU_TrainModel_Index;
 
-	HashMap<MicroService, Queue<Event>> GPU_TestModel;
-	int GPU_TestModel_Index;
+	private HashMap<MicroService, Queue<Event>> GPU_TestModel;
+	private int GPU_TestModel_Index;
 
-	Stack<StudentService> Students;
+	private Stack<StudentService> Students;
 
-	Stack<List<String>> conferenceEvent;
+	private Stack<List<String>> conferenceEvent;
 
-	TimeService timeService;
+	private TimeService timeService;
 
-	ConferenceService conference;
+	private ConferenceService conference;
 
 
 	/**
@@ -59,8 +59,8 @@ public class MessageBusImpl implements MessageBus {
 	}
 
 	/**
-	 * @pre //TODO
-	 * @post
+	 * @pre none
+	 * @post none
 	 */
 	@Override
 	public void sendBroadcast(Broadcast b) {
@@ -69,6 +69,8 @@ public class MessageBusImpl implements MessageBus {
 	}
 
 	/**
+	 * @pre none
+	 * @post none
 	 */
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
@@ -87,7 +89,6 @@ public class MessageBusImpl implements MessageBus {
 	}
 
 	/**
-	 * @pre  this.isRegistered(m) == true;
 	 * @post this.isRegistered(m) == false;
 	 */
 	@Override
@@ -106,14 +107,33 @@ public class MessageBusImpl implements MessageBus {
 		return null;
 	}
 
+	/**
+	 * the function check if this microService is subscribed for receiving a message, from message type
+	 * <p>
+	 * @return true if already subscribed or false
+	 * @param s the MicroService
+	 * @param m the Message
+	 */
 	private boolean isSubscribed(MicroService s, Message m){
 		return false;
 	}
 
+	/**
+	 * the function check if s the microService is registered
+	 * <p>
+	 * @return true if already registered or false
+	 * @param s the MicroService
+	 */
 	private boolean isRegistered(MicroService s){
 		return false;
 	}
 
+	/**
+	 * the function return the next MicroService that will handle the event
+	 * <p>
+	 * @return the next MicroService that will handle the event
+	 * @param m the MicroService
+	 */
 	private MicroService getNextMicroService(Message m){
 		return null;
 	}
