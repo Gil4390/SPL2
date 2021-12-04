@@ -6,6 +6,10 @@ public class ExampleBroadcast implements Broadcast {
 
     private String senderId;
 
+    public String getType(){
+        return "string";
+    }
+
     public ExampleBroadcast(String senderId) {
         this.senderId = senderId;
     }

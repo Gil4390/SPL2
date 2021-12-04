@@ -7,6 +7,7 @@ import java.util.*;
  * Passive object representing a single GPU.
  * Add all the fields described in the assignment as private fields.
  * Add fields and methods to this class as you see fit (including public methods and constructors).
+ * @inv processingDataBatch.size() <= capacity
  */
 public class GPU {
     /**
@@ -15,12 +16,15 @@ public class GPU {
     enum Type {RTX3090, RTX2080, GTX1080}
 
     private Type type;
+
+
     private Model model;
     private Cluster cluster;
 
     private Queue<DataBatch> processingDataBatch;
 
     private DataBatch[] unProcessedDataBatch;
+
     private Gpu_Callback callback;
 
     private int indexUPDB;
@@ -28,14 +32,15 @@ public class GPU {
     private int capacity;
     private int timeClock;
     private int trainingTime;
+
     private boolean ready;
 
-    public GPU(Type type,Cluster cluster){
-        this.type=type;
+    public GPU(String type,Cluster cluster){
+        this.type=fromStringToType(type);
         switch(type){
-            case GTX1080: {capacity = 8; trainingTime=4;}
-            case RTX2080: {capacity = 16; trainingTime=2;}
-            case RTX3090: {capacity = 32; trainingTime=1;}
+            case "GTX1080": {capacity = 8; trainingTime=4;}
+            case "RTX2080": {capacity = 16; trainingTime=2;}
+            case "RTX3090": {capacity = 32; trainingTime=1;}
         }
         processingDataBatch= new PriorityQueue<DataBatch>();
         this.cluster = cluster;
@@ -47,42 +52,12 @@ public class GPU {
     }
 
     /**
-     * this function initializes the gpu
-     * <p>
-     * @param callback the callback of finishing training the model
-     * @pre this.ready=false;
-     * @pre this.callback == null
-     * @post this.callback == callback
-     */
-    public void Initialize(Gpu_Callback callback)
-    {
-        this.callback=callback;
-        ready=true;
-    }
-
-    /**
      * represent a tick for the cpu.
-     * calls TrainModel() every tick
      * <p>
      * @post this.timeClock == @pre(this.timeClock)+1
      */
     public void tick(){
         timeClock++;
-        TrainModel();
-    }
-
-    /**
-     * this function store the model the gpu needs to train
-     * divide the data to data's batch's by calling DivideDataBatch();
-     * <p>
-     * @param model the model the gpu needs to train
-     * @pre this.model == null
-     * @post this.model == model
-     * @post processingDataBatch.isEmpty() != true;
-     */
-    public void ReciveModel(Model model){
-        this.model = model;
-        DivideDataBatch();
     }
 
     /**
@@ -94,7 +69,7 @@ public class GPU {
      * @post processingDataBatch.size <= @pre(processingDataBatch.size)
      * @post countPDB >= @pre(countPDB)
      */
-    private void TrainModel(){
+    public void TrainModel(){
         //if()
 
 
@@ -122,14 +97,13 @@ public class GPU {
 
     /**
      * this function divides the data to data batch's.
-     * after finish call sendDataBatch()
      * <p>
      * @pre this.model != null
      * @pre this.ready == false
-     * @pre processingDataBatch.isEmpty() == true;
-     * @post processingDataBatch.isEmpty() == false;
+     * @pre unProcessedDataBatch.isEmpty() == true;
+     * @post unProcessedDataBatch.isEmpty() == false;
      */
-    private void DivideDataBatch(){
+    public void DivideDataBatch(){
         /*
         Data data = model.getData();
         unProcessedDataBatch = new unProcessedDataBatch[];
@@ -137,7 +111,6 @@ public class GPU {
             new databatch
         unProcessedDataBatch[i]=datacath;
         */
-        sendDataBatch();
     }
 
     /**
@@ -145,10 +118,10 @@ public class GPU {
      * <p>
      * @pre this.model != null
      * @pre this.ready == false
-     * @pre processingDataBatch.size() <= capacity
+     * @pre unProcessedDataBatch.size()-1 > indexUPDB
      * @post this.indexUPDB >= @pre(indexUPDB)
      */
-    private void sendDataBatch(){
+    public void sendDataBatch(){
 
     }
 
@@ -160,5 +133,75 @@ public class GPU {
      * @post this.countPDB > @pre(countPDB)
      */
     public void ReceiveProcessedData(DataBatch databatch){
+    }
+
+    /**
+     * @return the Type by the string type
+     * <p>
+     * @param type the type
+     */
+    private Type fromStringToType(String type){
+        switch (type) {
+            case ("RTX3090"):
+                return Type.RTX3090;
+            case ("RTX2080"):
+                return Type.RTX2080;
+            case ("GTX1080"):
+                return Type.GTX1080;
+            default:
+                return null;
+        }
+    }
+
+
+    /**
+     * this function store the model the gpu needs to train
+     * <p>
+     * @param model the model the gpu needs to train
+     * @pre this.model == null
+     * @post this.model == model
+     */
+    public void setModel(Model model){
+        this.model = model;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public int getIndexUPDB() {
+        return indexUPDB;
+    }
+
+    public int getCountPDB() {
+        return countPDB;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public int getTimeClock() {
+        return timeClock;
+    }
+
+    public int getTrainingTime() {
+        return trainingTime;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public Gpu_Callback getCallback() {
+        return callback;
+    }
+
+    public Model getModel() {
+        return model;
+    }
+
+    public Queue<DataBatch> getProcessingDataBatch() {
+        return processingDataBatch;
     }
 }

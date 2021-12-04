@@ -4,6 +4,7 @@ import bgu.spl.mics.application.services.ConferenceService;
 import bgu.spl.mics.application.services.StudentService;
 import bgu.spl.mics.application.services.TimeService;
 
+import javax.swing.text.html.HTMLDocument;
 import java.util.*;
 
 /**
@@ -12,11 +13,10 @@ import java.util.*;
  * Only private fields and methods can be added to this class.
  */
 public class MessageBusImpl implements MessageBus {
-	private HashMap<MicroService, Queue<Event>> GPU_TrainModel;
-	private int GPU_TrainModel_Index;
 
-	private HashMap<MicroService, Queue<Event>> GPU_TestModel;
-	private int GPU_TestModel_Index;
+	private HashMap<String, Queue<MicroService>> eventsBroadcast_subscribe; // string = type event
+
+	private HashMap<String, Queue<Event>> microService_queues; // string = microservice name
 
 	private Stack<StudentService> Students;
 
@@ -99,7 +99,7 @@ public class MessageBusImpl implements MessageBus {
 
 	/**
 	 * @pre  this.isRegistered(m) == true;
-	 * @post this.queue.size() = @pre this.queue.size()-1
+	 * @post microService_queues[m].size() = @pre microService_queues[m].size()-1
 	 */
 	@Override
 	public Message awaitMessage(MicroService m) throws InterruptedException {
@@ -114,7 +114,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @param s the MicroService
 	 * @param m the Message
 	 */
-	private boolean isSubscribed(MicroService s, Message m){
+	public boolean isSubscribed(MicroService s, Message m){
 		return false;
 	}
 
@@ -124,7 +124,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @return true if already registered or false
 	 * @param s the MicroService
 	 */
-	private boolean isRegistered(MicroService s){
+	public boolean isRegistered(MicroService s){
 		return false;
 	}
 
@@ -136,5 +136,13 @@ public class MessageBusImpl implements MessageBus {
 	 */
 	private MicroService getNextMicroService(Message m){
 		return null;
+	}
+
+	public HashMap<String, Queue<MicroService>> getEventsBroadcast_subscribe() {
+		return eventsBroadcast_subscribe;
+	}
+
+	public HashMap<String, Queue<Event>> getMicroService_queues() {
+		return microService_queues;
 	}
 }
