@@ -1,5 +1,4 @@
-package bgu.spl.mics.application.objects;
-
+import bgu.spl.mics.application.objects.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestReporter;
@@ -11,7 +10,7 @@ class CPUTest {
     CPU cpu;
     @BeforeEach
     void setUp() {
-        cpu = new CPU(8,Cluster.getInstance());
+        cpu = new CPU(8);
     }
 
     @Test
@@ -19,7 +18,7 @@ class CPUTest {
         assertNull(cpu.getDataBatch());
         Data d = new Data("Text",7800);
         DataBatch data = new DataBatch(0,d);
-        cpu.ReceiveUnProcessedData(data);
+        cpu.ReceiveUnProcessedData(new <DataBatch ,String> Pair(data," "));
         assertEquals(cpu.getDataBatch(), data);
     }
 

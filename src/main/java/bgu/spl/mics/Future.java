@@ -17,9 +17,9 @@ public class Future<T> {
 	/**
 	 * This should be the only public constructor in this class.
 	 */
-	public Future(T result) {
+	public Future() {
 		//TODO: implement this
-		this.result=result;
+		this.result=null;
 		done = false;
 	}
 
@@ -30,11 +30,17 @@ public class Future<T> {
      * <p>
      * @return return the result of type T if it is available, if not wait until it is available.
      */
-	public T get() {
+	public synchronized T get() {
 		//TODO: implement this.
 		if(done)
 			return result;
-		//wait until done to be true
+		else{
+			try{
+				wait();
+			}
+			catch (InterruptedException e){}
+		}
+		done=true;
 		return result;
 	}
 	
@@ -47,17 +53,17 @@ public class Future<T> {
 	 * @post this.done = true;
 	 * @post this.result = result;
      */
-	public void resolve (T result) {
+	public synchronized void resolve (T result) {
 		//TODO: implement this.
-		//need to comutation
 		done = true;
+		this.result=result;
+		notify();
 	}
 	
 	/**
      * @return true if this object has been resolved, false otherwise
      */
 	public boolean isDone() {
-		//TODO: implement this.
 		return done;
 	}
 	
@@ -72,16 +78,17 @@ public class Future<T> {
      * 	       wait for {@code timeout} TimeUnits {@code unit}. If time has
      *         elapsed, return null.
      */
-	public T get(long timeout, TimeUnit unit) {
+	public synchronized T get(long timeout, TimeUnit unit) {
 		//TODO: implement this.
 		if(done)
 			return result;
 		else{
-			//unit.sleep(timeout);
-			if(done)
-				return result;
+			try{
+				unit.wait(timeout);
+			}
+			catch (InterruptedException e){}
 		}
-		return null;
+		return result;
 	}
 
 }

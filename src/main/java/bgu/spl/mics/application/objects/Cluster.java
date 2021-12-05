@@ -1,7 +1,9 @@
 package bgu.spl.mics.application.objects;
 
 
+import java.util.HashMap;
 import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * Passive object representing the cluster.
@@ -13,11 +15,10 @@ import java.util.PriorityQueue;
 public class Cluster {
 
 
-	private PriorityQueue<CPU> CPUs;
-	private PriorityQueue<GPU> GPUs;
+	private PriorityQueue<Pair<CPU, PriorityQueue<Pair<DataBatch,String>>>> CPUs;
+	private HashMap<String,GPU> GPUs;
 
-	private PriorityQueue<DataBatch> dataBATCH_ForCPU;
-	private PriorityQueue<DataBatch> dataBATCH_ForGPU;
+	private PriorityQueue<Pair<DataBatch,String>> dataBATCH_ForGPU;
 	private String statistics; //TODO: decide what Data structure will hold it
 
 	private Cluster(){
@@ -31,7 +32,12 @@ public class Cluster {
 		return null;
 	}
 
-	public PriorityQueue<DataBatch> getDataBATCH_ForCPU() {
-		return dataBATCH_ForCPU;
+	public void ReceiveDataFromCpu(Pair<DataBatch, String>dataBatchPair){
+		GPUs.get(dataBatchPair.getSecond()).ReceiveProcessedData(dataBatchPair.getFirst());
+	}
+	public void ReceiveDataFromGpu(Pair<DataBatch, String>dataBatchPair){
+		Pair<CPU, PriorityQueue<Pair<DataBatch,String>>> temp =CPUs.remove();
+		temp.getSecond().add(dataBatchPair);
+		CPUs.add(temp);
 	}
 }

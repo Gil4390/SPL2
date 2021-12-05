@@ -7,49 +7,39 @@ package bgu.spl.mics.application.objects;
  */
 public class CPU {
     private final int cores;
-    private DataBatch databatch;
+    private Pair<DataBatch,String> databatchPair;
     private final Cluster cluster;
     private boolean ready;
     private int processedTime;
     private int endProcessedTime;
 
-    public CPU(int numOfCores, Cluster cluster){
+    public CPU(int numOfCores){
         cores=numOfCores;
-        this.cluster=cluster;
+        this.cluster=Cluster.getInstance();
         ready=true;
         processedTime=0;
     }
 
     /**
-     * @return the databatch
-     */
-    public DataBatch getDataBatch(){return databatch;};
-
-    /**
-     * @return the processedTime, the amount of ticks that the cpu received
-     */
-    public int getProcessedTime(){return processedTime;};
-
-    /**
-     * @return the amount of tick that needed to process the databath
-     */
-    public int getEndProcessedTime(){return endProcessedTime;};
-
-    /**
      * this function receiving unProcessed data and store it.
      * also calculate the time it will take to process the data.
      * <p>
-     * @param databatch the databatch from the cluster;
+     * @param databatchPair a pair that contains databatch from the cluster and the gpu name the data came from;
      * @pre this.ready = true;
      * @pre this.databatch=null;
      * @post this.databatch != null;
      * @post this.endProcessedTime=@pre(processedTime)+(32/@pre(cores))*databatch.getProcessedTime();
      * @post ths.ready = false;
      */
-    public void ReceiveUnProcessedData(DataBatch databatch){
-        this.databatch=databatch;
-        ready=false;
-        endProcessedTime=processedTime+(32/cores)*databatch.getProcessTime();
+    public synchronized void ReceiveUnProcessedData(Pair<DataBatch,String> databatchPair){
+        if(ready) {
+            this.databatchPair = databatchPair;
+            ready = false;
+            endProcessedTime = processedTime + (32 / cores) * databatchPair.getFirst().getProcessTime();
+        }
+        else{
+            System.out.println("entered function ReceiveUnProcessedData when cpu ready was false");
+        }
     }
 
     /**
@@ -63,9 +53,9 @@ public class CPU {
     public void tickAndCompute(){
         processedTime++;
         if(!ready & processedTime==endProcessedTime){
-            //cluster.rec(databatch);
+            cluster.ReceiveDataFromCpu(databatchPair);
             endProcessedTime=0;
-            databatch=null;
+            databatchPair=null;
             ready=true;
         }
     }
@@ -76,4 +66,20 @@ public class CPU {
     public boolean isReady(){
         return ready;
     }
+
+    /**
+     * @return the databatch
+     */
+    public DataBatch getDataBatch(){return databatchPair.getFirst();};
+
+    /**
+     * @return the processedTime, the amount of ticks that the cpu received
+     */
+    public int getProcessedTime(){return processedTime;};
+
+    /**
+     * @return the amount of tick that needed to process the databath
+     */
+    public int getEndProcessedTime(){return endProcessedTime;};
+
 }

@@ -1,5 +1,4 @@
-package bgu.spl.mics;
-
+import bgu.spl.mics.Future;
 import bgu.spl.mics.application.objects.Model;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +14,7 @@ class FutureTest {
 
     @BeforeEach
     void setUp() {
-        f = new Future<String>(null);
+        f = new Future<String>();
     }
 
     @Test
@@ -68,7 +67,7 @@ class FutureTest {
         k.run();
         t.run();
 
-        f=new Future<String>(null);
+        f=new Future<String>();
         k = new Thread(){
             public void run() {
                 assertNull(f.get(Timeout,unit));
