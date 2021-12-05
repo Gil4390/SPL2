@@ -11,13 +11,14 @@ class CPUTest {
     CPU cpu;
     @BeforeEach
     void setUp() {
-        cpu = new CPU(8,new Cluster());
+        cpu = new CPU(8,Cluster.getInstance());
     }
 
     @Test
     void receiveUnProcessedData() {
         assertNull(cpu.getDataBatch());
-        DataBatch data = new DataBatch();
+        Data d = new Data("Text",7800);
+        DataBatch data = new DataBatch(0,d);
         cpu.ReceiveUnProcessedData(data);
         assertEquals(cpu.getDataBatch(), data);
     }

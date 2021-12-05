@@ -19,7 +19,7 @@ class MessageBusImplTest {
     @BeforeEach
     void setUp() {
         mBus=new MessageBusImpl();
-        e = new <String> ExampleEvent("test");
+        e = new ExampleEvent("test");
         m = new GPUService("gpu test1");
         b = new ExampleBroadcast("1234");
     }
@@ -36,7 +36,7 @@ class MessageBusImplTest {
             }
         }
         assertNull(result);
-        mBus.subscribeEvent(e ,m);
+        mBus.subscribeEvent(e.getClass() ,m);
         result= null;
         for (int i=0; i<q.size();i++) {
             MicroService temp = q.remove();
@@ -61,7 +61,7 @@ class MessageBusImplTest {
         }
         assertNull(result);
 
-        mBus.subscribeEvent(e ,b);
+        mBus.subscribeBroadcast(b.getClass() ,m);
 
         result= null;
         for (int i=0; i<q.size();i++) {
@@ -84,10 +84,26 @@ class MessageBusImplTest {
 
     @Test
     void sendBroadcast() {
+        mBus.register(m);
+        mBus.subscribeBroadcast(b.getClass(),m);
+        Queue <MicroService> q = mBus.getEventsBroadcast_subscribe().get(b.getType());
+        MicroService temp = q.peek();
+        Queue temp2 = mBus.getMicroService_queues().get(temp.getName());
+        assertEquals(0,temp2.size());
+        mBus.sendBroadcast(b);
+        assertEquals(1,temp2.size());
     }
 
     @Test
     void sendEvent() {
+        mBus.register(m);
+        mBus.subscribeEvent(e.getClass(),m);
+        Queue <MicroService> q = mBus.getEventsBroadcast_subscribe().get(b.getType());
+        MicroService temp = q.peek();
+        Queue temp2 = mBus.getMicroService_queues().get(temp.getName());
+        assertEquals(0,temp2.size());
+        mBus.sendEvent(e);
+        assertEquals(1,temp2.size());
     }
 
     @Test
@@ -107,12 +123,43 @@ class MessageBusImplTest {
 
     @Test
     void awaitMessage() {
+        try{
+            mBus.awaitMessage(m);
+            assertTrue(false);
+        }
+        catch (Exception e){
+            assertTrue(e.equals(new InterruptedException()));
+        }
+
+        mBus.register(m);
+        Thread t = new Thread(){
+            public void run(){
+                try{
+                    mBus.awaitMessage(m);
+                }
+                catch (Exception e){
+                    assertTrue(false);
+                }
+            }
+        };
+        t.run();
+
+        try {
+            Thread.sleep(1000);
+            assertEquals(t.getState(),Thread.State.WAITING);
+            mBus.subscribeEvent(e.getClass(),m);
+            mBus.sendEvent(e);
+            Thread.sleep(10);
+            assertNotEquals(t.getState(),Thread.State.WAITING);
+        }
+        catch (Exception e){
+        }
     }
 
     @Test
     void isSubscribed() {
         assertFalse(mBus.isSubscribed(m,e));
-        mBus.subscribeEvent(e,m);
+        mBus.subscribeEvent(e.getClass(),m);
         assertTrue(mBus.isSubscribed(m,e));
     }
 

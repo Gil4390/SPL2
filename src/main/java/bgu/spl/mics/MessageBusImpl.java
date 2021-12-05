@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class MessageBusImpl implements MessageBus {
 
-	private HashMap<String, Queue<MicroService>> eventsBroadcast_subscribe; // string = type event
+	private HashMap<Class<? extends Message>, Queue<MicroService>> eventsBroadcast_subscribe; // string = type event
 
 	private HashMap<String, Queue<Event>> microService_queues; // string = microservice name
 
@@ -138,7 +138,7 @@ public class MessageBusImpl implements MessageBus {
 		return null;
 	}
 
-	public HashMap<String, Queue<MicroService>> getEventsBroadcast_subscribe() {
+	public HashMap<Class<? extends Message>, Queue<MicroService>> getEventsBroadcast_subscribe() {
 		return eventsBroadcast_subscribe;
 	}
 
