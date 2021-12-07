@@ -22,7 +22,7 @@ public class Cluster {
 
 	private Stack<String> modelNames;
 
-	private static Cluster cluster;
+	private volatile static Cluster cluster;
 
 	private int numberOfDataBatchProcessedByCpu;
 
@@ -37,9 +37,13 @@ public class Cluster {
 	/**
      * Retrieves the single instance of this class.
      */
-	public static Cluster getInstance() {
-		if(cluster==null) {
-			cluster= new Cluster();
+	public static Cluster getInstance() {//check if this is good thread save singleton
+		if(cluster==null){
+			synchronized (cluster){
+				if(cluster==null) {
+					cluster = new Cluster();
+				}
+			}
 		}
 		return cluster;
 	}
