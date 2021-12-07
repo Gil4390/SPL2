@@ -14,15 +14,15 @@ public class Data {
 
     private Type type;
     private int processed;
-
-    public int getSize() {
-        return size;
-    }
-
     private int size;
 
     public Data(String type, int size){
-
+        this.type = FromStringToType(type);
+        this.size = size;
+        this.processed = 0;
+    }
+    public int getSize() {
+        return size;
     }
 
     /**
@@ -31,15 +31,24 @@ public class Data {
      * @param type the type
      */
     private Data.Type FromStringToType(String type){
-        switch (type) {
-            case ("Text"):
+        switch (type.toLowerCase()) {
+            case ("text"):
                 return Data.Type.Text;
-            case ("Images"):
+            case ("images"):
                 return Data.Type.Images;
-            case ("Tabular"):
+            case ("tabular"):
                 return Data.Type.Tabular;
             default:
                 return null;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Data{" +
+                "type=" + type +
+                ", processed=" + processed +
+                ", size=" + size +
+                '}';
     }
 }

@@ -12,14 +12,60 @@ public class Student {
         MSc, PhD
     }
 
-    private int name;
+    private String name;
     private String department;
     private Degree status;
     private int publications;
     private int papersRead;
 
-    public Student(String name, String department, String degree){
 
+    public Student(String name, String department, String degree){
+        this.name = name;
+        this.department = department;
+        this.status = FromStringToType(degree);
+        publications = 0;
+        papersRead = 0;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public Degree getStatus() {
+        return status;
+    }
+
+    public int getPublications() {
+        return publications;
+    }
+
+    public int getPapersRead() {
+        return papersRead;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public void setStatus(Degree status) {
+        this.status = status;
+    }
+
+    public void setPublications(int publications) {
+        this.publications = publications;
+    }
+
+    public void setPapersRead(int papersRead) {
+        this.papersRead = papersRead;
     }
 
     /**
@@ -38,4 +84,14 @@ public class Student {
         }
     }
 
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", department='" + department + '\'' +
+                ", status=" + status +
+                ", publications=" + publications +
+                ", papersRead=" + papersRead +
+                '}';
+    }
 }

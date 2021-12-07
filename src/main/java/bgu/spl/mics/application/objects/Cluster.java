@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.objects;
 
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -39,5 +40,10 @@ public class Cluster {
 		Pair<CPU, PriorityQueue<Pair<DataBatch,String>>> temp =CPUs.remove();
 		temp.getSecond().add(dataBatchPair);
 		CPUs.add(temp);
+	}
+
+	//for gpu test.
+	public Collection<Object> getDataBATCH_ForCPU() {
+		return null;
 	}
 }

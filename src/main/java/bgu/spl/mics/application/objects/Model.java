@@ -17,6 +17,87 @@ public class Model {
     private Result result;
 
     public Model(String name, Data data, Student student){
+        this.name = name;
+        this.data = data;
+        this.student = student;
+        this.status = Status.PreTrained;
+    }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Data getData() {
+        return data;
+    }
+
+    public void setData(Data data) {
+        this.data = data;
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
+    }
+
+    public String getStatusString() {
+        return status.toString();
+    }
+
+    public void setStatusString(String status) {
+        this.status = FromStringToStatus(status);
+    }
+
+    public String getResultString() {
+        return result.toString();
+    }
+
+    public void setResultString(String result) {
+        this.result = FromStringToResult(result);
+    }
+
+    @Override
+    public String toString() {
+        return "Model{" +
+                "name='" + name + '\'' +
+                ", data=" + data +
+                ", student=" + student +
+                ", status=" + status +
+                '}';
+    }
+
+    private Model.Result FromStringToResult(String type){
+        switch (type) {
+            case ("None"):
+                return Result.None;
+            case ("Good"):
+                return Result.Good;
+            case ("Bad"):
+                return Result.Bad;
+            default:
+                return null;
+        }
+    }
+
+    private Model.Status FromStringToStatus(String type){
+        switch (type) {
+            case ("PreTrained"):
+                return Status.PreTrained;
+            case ("Training"):
+                return Status.Training;
+            case ("Trained"):
+                return Status.Trained;
+            case ("Tested"):
+                return Status.Tested;
+            default:
+                return null;
+        }
     }
 }
