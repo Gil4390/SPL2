@@ -2,9 +2,7 @@ package bgu.spl.mics.application.objects;
 
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Passive object representing the cluster.
@@ -20,23 +18,37 @@ public class Cluster {
 	private HashMap<String,GPU> GPUs;
 
 	private PriorityQueue<Pair<DataBatch,String>> dataBATCH_ForGPU;
-	private String statistics; //TODO: decide what Data structure will hold it
+	private String statistics;
+
+	private Stack<String> modelNames;
+
+	private static Cluster cluster;
+
+	private int numberOfDataBatchProcessedByCpu;
+
+	private int gpu_TimeUsed;
+	private int cpu_TimeUsed;
 
 	private Cluster(){
-
+		numberOfDataBatchProcessedByCpu=0;
+		gpu_TimeUsed=0;
+		cpu_TimeUsed=0;
 	}
 	/**
      * Retrieves the single instance of this class.
      */
 	public static Cluster getInstance() {
-		//TODO: Implement this
-		return null;
+		if(cluster==null) {
+			cluster= new Cluster();
+		}
+		return cluster;
 	}
 
 	public void ReceiveDataFromCpu(Pair<DataBatch, String>dataBatchPair){
+		numberOfDataBatchProcessedByCpu ++;
 		GPUs.get(dataBatchPair.getSecond()).ReceiveProcessedData(dataBatchPair.getFirst());
 	}
-	public void ReceiveDataFromGpu(Pair<DataBatch, String>dataBatchPair){
+	public void ReceiveDataFromGpu(Pair<DataBatch, String>dataBatchPair){//check if needs to synchronized
 		Pair<CPU, PriorityQueue<Pair<DataBatch,String>>> temp =CPUs.remove();
 		temp.getSecond().add(dataBatchPair);
 		CPUs.add(temp);
@@ -45,5 +57,33 @@ public class Cluster {
 	//for gpu test.
 	public Collection<Object> getDataBATCH_ForCPU() {
 		return null;
+	}
+
+	public synchronized void calculateTimeUnitUsed(){
+		for (Pair<CPU, PriorityQueue<Pair<DataBatch,String>>> pair:CPUs) {
+			cpu_TimeUsed += pair.getFirst().getProcessedTime();
+		}
+		Collection <GPU> collectionOfGPUs = GPUs.values();
+		for (GPU gpu:collectionOfGPUs) {
+			gpu_TimeUsed += gpu.getTimeClock();
+		}
+	}
+
+	public void finishTrainModel(String modelName){
+		modelNames.add(modelName);
+	}
+
+	public int getNumberOfDataBatchProcessedByCpu(){
+		return numberOfDataBatchProcessedByCpu;
+	}
+	public int getCpu_TimeUsed() {
+		return cpu_TimeUsed;
+	}
+
+	public int getGpu_TimeUsed() {
+		return gpu_TimeUsed;
+	}
+	public Stack<String> getModelNames() {
+		return modelNames;
 	}
 }

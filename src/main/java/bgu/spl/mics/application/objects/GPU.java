@@ -91,6 +91,7 @@ public class GPU {
      */
     public void Finish(){
         //callback.call();
+        cluster.finishTrainModel(model.getName());
     }
 
     /**
