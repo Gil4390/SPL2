@@ -26,6 +26,13 @@ public class MessageBusImpl implements MessageBus {
 
 	private ConferenceService conference;
 
+	private MessageBusImpl() {
+		//TODO singelton
+	}
+	public static MessageBusImpl getInstance(){
+		//TODO
+		return null;
+	}
 
 	/**
 	 * @pre  this.isSubscribed(m,type) == false;

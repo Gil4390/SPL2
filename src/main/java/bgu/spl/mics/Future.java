@@ -18,7 +18,6 @@ public class Future<T> {
 	 * This should be the only public constructor in this class.
 	 */
 	public Future() {
-		//TODO: implement this
 		this.result=null;
 		done = false;
 	}
@@ -31,7 +30,6 @@ public class Future<T> {
      * @return return the result of type T if it is available, if not wait until it is available.
      */
 	public synchronized T get() {
-		//TODO: implement this.
 		if(done)
 			return result;
 		else{
@@ -40,7 +38,6 @@ public class Future<T> {
 			}
 			catch (InterruptedException e){}
 		}
-		done=true;
 		return result;
 	}
 	
@@ -54,7 +51,6 @@ public class Future<T> {
 	 * @post this.result = result;
      */
 	public synchronized void resolve (T result) {
-		//TODO: implement this.
 		done = true;
 		this.result=result;
 		notify();
@@ -79,12 +75,11 @@ public class Future<T> {
      *         elapsed, return null.
      */
 	public synchronized T get(long timeout, TimeUnit unit) {
-		//TODO: implement this.
 		if(done)
 			return result;
 		else{
 			try{
-				unit.wait(timeout);
+				unit.wait(timeout); //TODO check if time works
 			}
 			catch (InterruptedException e){}
 		}

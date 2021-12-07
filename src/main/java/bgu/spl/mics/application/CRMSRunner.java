@@ -98,5 +98,11 @@ public class CRMSRunner {
         TICK_TIME = Integer.parseInt(TickTime.substring(0, TickTime.length()-2));
 
         DURATION = Integer.parseInt(Duration.substring(0, Duration.length()-2));
+
+
+        //TODO add cpus gpus to cluster;
+        //TODO add ID to cpu
+
+        //TODO Create services and register, subscribe
     }
 }

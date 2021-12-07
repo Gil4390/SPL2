@@ -6,6 +6,7 @@ package bgu.spl.mics.application.objects;
  * Add fields and methods to this class as you see fit (including public methods and constructors).
  */
 public class CPU {
+    private int id;
     private final int cores;
     private Pair<DataBatch,String> databatchPair;
     private final Cluster cluster;
@@ -20,6 +21,9 @@ public class CPU {
         processedTime=0;
     }
 
+    public void setId(int id){
+        this.id = id;
+    }
     /**
      * this function receiving unProcessed data and store it.
      * also calculate the time it will take to process the data.
@@ -53,7 +57,7 @@ public class CPU {
     public void tickAndCompute(){
         processedTime++;
         if(!ready & processedTime==endProcessedTime){
-            cluster.ReceiveDataFromCpu(databatchPair);
+            cluster.ReceiveDataFromCpu(databatchPair, this.id);
             endProcessedTime=0;
             databatchPair=null;
             ready=true;

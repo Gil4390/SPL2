@@ -19,7 +19,7 @@ class MessageBusImplTest {
     ExampleBroadcast  b;
     @BeforeEach
     void setUp() {
-        mBus=new MessageBusImpl();
+        mBus = MessageBusImpl.getInstance();
         e = new ExampleEvent("test");
         m = new GPUService("gpu test1");
         b = new ExampleBroadcast("1234");

@@ -48,14 +48,17 @@ public class Cluster {
 		return cluster;
 	}
 
-	public void ReceiveDataFromCpu(Pair<DataBatch, String>dataBatchPair){
+	public void ReceiveDataFromCpu(Pair<DataBatch,String> dataBatchPair, int cpuID){
 		numberOfDataBatchProcessedByCpu ++;
 		GPUs.get(dataBatchPair.getSecond()).ReceiveProcessedData(dataBatchPair.getFirst());
+		//TODO AMIT
+		//if()
 	}
-	public void ReceiveDataFromGpu(Pair<DataBatch, String>dataBatchPair){//check if needs to synchronized
+	public void ReceiveDataFromGpu(Pair<DataBatch,String> dataBatchPair){//check if needs to synchronized
 		Pair<CPU, PriorityQueue<Pair<DataBatch,String>>> temp =CPUs.remove();
 		temp.getSecond().add(dataBatchPair);
 		CPUs.add(temp);
+		//TODO AMIT
 	}
 
 	//for gpu test.
@@ -89,5 +92,12 @@ public class Cluster {
 	}
 	public Stack<String> getModelNames() {
 		return modelNames;
+	}
+
+	public void AddCPUS(Vector<CPU> cpus){
+		//TODO AMIT
+	}
+	public void AddGPUS(Vector<GPU> gpus){
+		//TODO AMIT
 	}
 }
