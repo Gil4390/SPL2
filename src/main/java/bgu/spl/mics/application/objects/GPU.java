@@ -17,6 +17,7 @@ public class GPU {
 
     private Type type;
 
+    int id;
 
     private Model model;
     private Cluster cluster;
@@ -202,5 +203,13 @@ public class GPU {
 
     public DataBatch[] getUnProcessedDataBatch() {
         return unProcessedDataBatch;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) { //Todo gil, need to set an id for every gpu
+        this.id = id;
     }
 }

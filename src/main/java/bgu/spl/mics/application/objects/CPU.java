@@ -8,7 +8,7 @@ package bgu.spl.mics.application.objects;
 public class CPU {
     private int id;
     private final int cores;
-    private Pair<DataBatch,String> databatchPair;
+    private Pair<DataBatch,Integer> databatchPair;
     private final Cluster cluster;
     private boolean ready;
     private int processedTime;
@@ -21,9 +21,6 @@ public class CPU {
         processedTime=0;
     }
 
-    public void setId(int id){
-        this.id = id;
-    }
     /**
      * this function receiving unProcessed data and store it.
      * also calculate the time it will take to process the data.
@@ -35,7 +32,7 @@ public class CPU {
      * @post this.endProcessedTime=@pre(processedTime)+(32/@pre(cores))*databatch.getProcessedTime();
      * @post ths.ready = false;
      */
-    public synchronized void ReceiveUnProcessedData(Pair<DataBatch,String> databatchPair){
+    public synchronized void ReceiveUnProcessedData(Pair<DataBatch,Integer> databatchPair){
         if(ready) {
             this.databatchPair = databatchPair;
             ready = false;
@@ -84,6 +81,12 @@ public class CPU {
     /**
      * @return the amount of tick that needed to process the databath
      */
-    public int getEndProcessedTime(){return endProcessedTime;};
+    public int getEndProcessedTime(){return endProcessedTime;}
+    public int getId() {
+        return id;
+    }
+    public void setId(int id){
+        this.id = id;
+    }
 
 }
