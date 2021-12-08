@@ -22,8 +22,6 @@ public class Cluster {
 
 	private Stack<String> modelNames;
 
-	private volatile static Cluster cluster;
-
 	private int numberOfDataBatchProcessedByCpu;
 
 	private int gpu_TimeUsed;
@@ -37,15 +35,13 @@ public class Cluster {
 	/**
      * Retrieves the single instance of this class.
      */
-	public static Cluster getInstance() {//check if this is good thread save singleton
-		if(cluster==null){
-			synchronized (cluster){
-				if(cluster==null) {
-					cluster = new Cluster();
-				}
-			}
-		}
-		return cluster;
+
+	private static class clusterHolder{
+		private static Cluster clusterInstance = new Cluster();
+	}
+
+	public static Cluster getInstance() {
+		return clusterHolder.clusterInstance;
 	}
 
 	public void ReceiveDataFromCpu(Pair<DataBatch,String> dataBatchPair, int cpuID){

@@ -1,5 +1,6 @@
 package bgu.spl.mics;
 
+import bgu.spl.mics.application.objects.Cluster;
 import bgu.spl.mics.application.services.ConferenceService;
 import bgu.spl.mics.application.services.StudentService;
 import bgu.spl.mics.application.services.TimeService;
@@ -29,6 +30,7 @@ public class MessageBusImpl implements MessageBus {
 	private MessageBusImpl() {
 		//TODO singelton
 	}
+
 	public static MessageBusImpl getInstance(){
 		//TODO
 		return null;
