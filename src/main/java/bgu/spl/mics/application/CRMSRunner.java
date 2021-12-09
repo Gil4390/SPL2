@@ -80,9 +80,12 @@ public class CRMSRunner {
             GPUS.add(gpu);
         }
 
+        int CPUID = 0;
         cpus = cpus.substring(1,cpus.length()-1);
         for (String str : cpus.split(", ")) {
             CPU cpu = new CPU(Integer.parseInt(str.substring(0,str.length()-2)));
+            cpu.setId(CPUID);
+            CPUID++;
             CPUS.add(cpu);
         }
 
@@ -100,9 +103,14 @@ public class CRMSRunner {
         DURATION = Integer.parseInt(Duration.substring(0, Duration.length()-2));
 
 
-        //TODO add cpus gpus to cluster;
-        //TODO add ID to cpu
+        Cluster cluster = Cluster.getInstance();
+        cluster.AddCPUS(CPUS);
+        cluster.AddGPUS(GPUS);
 
         //TODO Create services and register, subscribe
+        for (int i = 0; i < STUDENTS.size(); i++) {
+            //create student service for each student
+            //each studentService will check if the student has models to train, test or publish...
+        }
     }
 }
