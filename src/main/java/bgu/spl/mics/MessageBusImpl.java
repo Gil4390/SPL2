@@ -31,9 +31,12 @@ public class MessageBusImpl implements MessageBus {
 		//TODO singelton
 	}
 
-	public static MessageBusImpl getInstance(){
-		//TODO
-		return null;
+	private static class MessageBusImplHolder{
+		private static MessageBusImpl messageBusImplInstance = new MessageBusImpl();
+	}
+
+	public static MessageBusImpl getInstance() {
+		return MessageBusImpl.MessageBusImplHolder.messageBusImplInstance;
 	}
 
 	/**
