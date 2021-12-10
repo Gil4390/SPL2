@@ -149,7 +149,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @param m the Message
 	 */
 	public boolean isSubscribed(MicroService s, Message m){
-		return false;
+		return Broadcast_subscribe.get(m).contains((s.getName()));
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @param s the MicroService
 	 */
 	public boolean isRegistered(MicroService s){
-		return false;
+		return microService_queues.containsKey((s.getName()));
 	}
 
 	/**
