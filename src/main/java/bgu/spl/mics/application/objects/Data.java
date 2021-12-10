@@ -21,15 +21,7 @@ public class Data {
         this.size = size;
         this.processed = 0;
     }
-    public int getSize() {
-        return size;
-    }
 
-    /**
-     * @return the Type by the string type
-     * <p>
-     * @param type the type
-     */
     private Data.Type FromStringToType(String type){
         switch (type.toLowerCase()) {
             case ("text"):
@@ -50,5 +42,17 @@ public class Data {
                 ", processed=" + processed +
                 ", size=" + size +
                 '}';
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public int getProcessed() {
+        return processed;
+    }
+
+    public int getSize() {
+        return size;
     }
 }
