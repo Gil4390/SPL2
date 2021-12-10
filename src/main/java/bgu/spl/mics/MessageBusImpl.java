@@ -20,9 +20,9 @@ public class MessageBusImpl implements MessageBus {
 
 	private HashMap<String, Queue<Message>> microService_queues; // string = microservice name
 
-	private Stack<StudentService> Students;
+	//private Stack<StudentService> Students;
 
-	private Stack<List<String>> conferenceEvent;
+	//private Stack<List<String>> conferenceEvent;
 
 	private TimeService timeService;
 
@@ -46,7 +46,6 @@ public class MessageBusImpl implements MessageBus {
 	 */
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
-		// TODO Auto-generated method stub
 		event_subscribe.get(type).add(m);
 
 	}
@@ -57,7 +56,6 @@ public class MessageBusImpl implements MessageBus {
 	 */
 	@Override
 	public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
-		// TODO Auto-generated method stub
 		Broadcast_subscribe.get(type).add(m);
 	}
 
@@ -68,7 +66,6 @@ public class MessageBusImpl implements MessageBus {
 	 */
 	@Override
 	public <T> void complete(Event<T> e, T result) {
-		// TODO Auto-generated method stub
 		e.getFuture().resolve(result);
 	}
 
@@ -77,8 +74,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @post none
 	 */
 	@Override
-	public void sendBroadcast(Broadcast b) {
-		// TODO Auto-generated method stub
+	public void sendBroadcast(Broadcast b) {//todo notify the microservice that waits
 		LinkedList<MicroService> list = Broadcast_subscribe.get(b);
 		for (MicroService m:list) {
 			microService_queues.get(m.getName()).add(b);
@@ -90,8 +86,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @post none
 	 */
 	@Override
-	public <T> Future<T> sendEvent(Event<T> e) {
-		// TODO Auto-generated method stub
+	public <T> Future<T> sendEvent(Event<T> e) {//todo notify the microservice that waits
 		Queue<MicroService> queue = event_subscribe.get(e);
 		MicroService m = queue.poll();
 		microService_queues.get(m.getName()).add(e);
@@ -105,7 +100,6 @@ public class MessageBusImpl implements MessageBus {
 	 */
 	@Override
 	public void register(MicroService m) {
-		// TODO Auto-generated method stub
 		microService_queues.put(m.getName(),new PriorityQueue<Message>());
 	}
 
@@ -114,7 +108,6 @@ public class MessageBusImpl implements MessageBus {
 	 */
 	@Override
 	public void unregister(MicroService m) {
-		// TODO Auto-generated method stub
 		for (Queue<MicroService> queue:event_subscribe.values()) {
 			for(int i=0; i<queue.size();i++){
 				MicroService temp = queue.poll();
@@ -137,8 +130,12 @@ public class MessageBusImpl implements MessageBus {
 	 */
 	@Override
 	public Message awaitMessage(MicroService m) throws InterruptedException {
-		// TODO Auto-generated method stub
-		return null;
+		if(!isRegistered(m))
+			throw new IllegalStateException();
+		if(microService_queues.get(m.getName()).isEmpty())
+			wait();
+
+		return microService_queues.get(m.getName()).poll();
 	}
 
 	/**
