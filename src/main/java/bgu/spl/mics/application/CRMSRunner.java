@@ -74,18 +74,21 @@ public class CRMSRunner {
             }
         }
 
+        int GPU_ID = 0;
         gpus = gpus.substring(1,gpus.length()-1);
         for (String str : gpus.split(", ")) {
             GPU gpu = new GPU(str, Cluster.getInstance());
+            gpu.setId(GPU_ID);
+            GPU_ID++;
             GPUS.add(gpu);
         }
 
-        int CPUID = 0;
+        int CPU_ID = 0;
         cpus = cpus.substring(1,cpus.length()-1);
         for (String str : cpus.split(", ")) {
             CPU cpu = new CPU(Integer.parseInt(str.substring(0,str.length()-2)));
-            cpu.setId(CPUID);
-            CPUID++;
+            cpu.setId(CPU_ID);
+            CPU_ID++;
             CPUS.add(cpu);
         }
 
