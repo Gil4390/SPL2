@@ -15,9 +15,10 @@ import java.util.*;
  */
 public class MessageBusImpl implements MessageBus {
 
-	private HashMap<Class<? extends Message>, Queue<MicroService>> eventsBroadcast_subscribe; // string = type event
+	private HashMap<Class<? extends Message>, Queue<MicroService>> event_subscribe; // string = type event
+	private HashMap<Class<? extends Message>,LinkedList<MicroService>> Broadcast_subscribe;
 
-	private HashMap<String, Queue<Event>> microService_queues; // string = microservice name
+	private HashMap<String, Queue<Message>> microService_queues; // string = microservice name
 
 	private Stack<StudentService> Students;
 
@@ -27,8 +28,8 @@ public class MessageBusImpl implements MessageBus {
 
 	private ConferenceService conference;
 
-	private MessageBusImpl() {
-		//TODO singelton
+	private MessageBusImpl() {//todo create all event and broadcast in eventsBroadcast_subscribe
+		//todo make this function a thread save
 	}
 
 	private static class MessageBusImplHolder{
@@ -46,6 +47,7 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
 		// TODO Auto-generated method stub
+		event_subscribe.get(type).add(m);
 
 	}
 
@@ -56,7 +58,7 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
 		// TODO Auto-generated method stub
-
+		Broadcast_subscribe.get(type).add(m);
 	}
 
 	/**
@@ -67,7 +69,7 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public <T> void complete(Event<T> e, T result) {
 		// TODO Auto-generated method stub
-
+		e.getFuture().resolve(result);
 	}
 
 	/**
@@ -77,7 +79,10 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public void sendBroadcast(Broadcast b) {
 		// TODO Auto-generated method stub
-
+		LinkedList<MicroService> list = Broadcast_subscribe.get(b);
+		for (MicroService m:list) {
+			microService_queues.get(m.getName()).add(b);
+		}
 	}
 
 	/**
@@ -87,7 +92,11 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
 		// TODO Auto-generated method stub
-		return null;
+		Queue<MicroService> queue = event_subscribe.get(e);
+		MicroService m = queue.poll();
+		microService_queues.get(m.getName()).add(e);
+		queue.add(m);
+		return e.getFuture();
 	}
 
 	/**
@@ -97,7 +106,7 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public void register(MicroService m) {
 		// TODO Auto-generated method stub
-
+		microService_queues.put(m.getName(),new PriorityQueue<Message>());
 	}
 
 	/**
@@ -106,7 +115,20 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public void unregister(MicroService m) {
 		// TODO Auto-generated method stub
-
+		for (Queue<MicroService> queue:event_subscribe.values()) {
+			for(int i=0; i<queue.size();i++){
+				MicroService temp = queue.poll();
+				if(temp.getName()!=m.getName())
+					queue.add(m);
+			}
+		}
+		for (LinkedList<MicroService> list:Broadcast_subscribe.values()) {
+			for (MicroService temp:list) {
+				if(temp.getName()==m.getName())
+					list.remove(temp);
+			}
+		}
+		microService_queues.remove(m.getName());
 	}
 
 	/**
@@ -150,11 +172,15 @@ public class MessageBusImpl implements MessageBus {
 		return null;
 	}
 
-	public HashMap<Class<? extends Message>, Queue<MicroService>> getEventsBroadcast_subscribe() {
-		return eventsBroadcast_subscribe;
+	public HashMap<Class<? extends Message>, Queue<MicroService>> getEvent_subscribe() {
+		return event_subscribe;
 	}
 
-	public HashMap<String, Queue<Event>> getMicroService_queues() {
+	public HashMap<Class<? extends Message>, LinkedList<MicroService>> getBroadcast_subscribe() {
+		return Broadcast_subscribe;
+	}
+
+	public HashMap<String, Queue<Message>> getMicroService_queues() {
 		return microService_queues;
 	}
 }

@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.objects.GPU;
 
 /**
  * GPU service is responsible for handling the
@@ -13,6 +14,7 @@ import bgu.spl.mics.MicroService;
  */
 public class GPUService extends MicroService {
 
+    private GPU gpu;
     public GPUService(String name) {
         super("Change_This_Name");
         // TODO Implement this
@@ -22,5 +24,19 @@ public class GPUService extends MicroService {
     protected void initialize() {
         // TODO Implement this
 
+    }
+
+    public void tick(){//todo
+        gpu.tick();
+
+
+
+        if(gpu.getCountPDB()==gpu.getUnProcessedDataBatch().length) {
+            gpu.Finish();
+        }
+    }
+
+    public GPU getGpu() {
+        return gpu;
     }
 }
