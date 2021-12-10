@@ -22,7 +22,7 @@ public class GPU {
     private Model model;
     private Cluster cluster;
 
-    private Queue<DataBatch> processingDataBatch;
+    private Queue<Pair<DataBatch,Integer>> processingDataBatch;
 
     private DataBatch[] unProcessedDataBatch;
 
@@ -41,7 +41,7 @@ public class GPU {
             case "RTX2080": {capacity = 16; trainingTime=2;}
             case "RTX3090": {capacity = 32; trainingTime=1;}
         }
-        processingDataBatch= new PriorityQueue<DataBatch>();
+        processingDataBatch= new PriorityQueue<Pair<DataBatch,Integer>>();
         this.cluster = cluster;
         countPDB=0;
         model = null;
@@ -60,8 +60,7 @@ public class GPU {
     }
 
     /**
-     * this train the process data the gpu holds
-     * if in this tick finished training the model than send a message back to MessageBus and calls finish()
+     * this function trains the process data the gpu holds
      * <p>
      * @pre this.ready == false
      * @pre processingDataBatch.isEmpty() != true;
@@ -69,14 +68,14 @@ public class GPU {
      * @post countPDB >= @pre(countPDB)
      */
     public void TrainModel(){
-        //if()
-
-
-        //finish()
+        while(!processingDataBatch.isEmpty() && processingDataBatch.peek().getSecond()+trainingTime<=timeClock) {
+            processingDataBatch.poll();
+            countPDB++;
+        }
     }
 
     /**
-     * this function sends back a call back that the gpu finished training the model
+     * this function resat the gpu for a new model
      * <p>
      * @pre this.model != null
      * @pre this.ready == false
@@ -84,15 +83,19 @@ public class GPU {
      * @pre processingDataBatch.isEmpty() == true;
      * @post this.ready == true
      * @post this.model == null
-     * @post this.processingDataBatch == null
      * @post this.unProcessedDataBatch == null
      * @post this.indexUPDB == 0
      * @post this.countPDB ==0
      * @post this.trainingTime =0;
      */
     public void Finish(){
-        //callback.call();
         cluster.finishTrainModel(model.getName());
+        model=null;
+        countPDB=0;
+        indexUPDB=0;
+        trainingTime=0;
+        unProcessedDataBatch=null;
+        this.ready=true;
     }
 
     /**
@@ -104,13 +107,12 @@ public class GPU {
      * @post unProcessedDataBatch.isEmpty() == false;
      */
     public void DivideDataBatch(){
-        /*
-        Data data = model.getData();
-        unProcessedDataBatch = new unProcessedDataBatch[];
-        for(0....data/1000)
-            new databatch
-        unProcessedDataBatch[i]=datacath;
-        */
+        int size =model.getData().getSize()/1000;
+        unProcessedDataBatch = new DataBatch[size];
+        for(int i=0; i<size;i++){
+            DataBatch data = new DataBatch(i*1000,model.getData());
+            unProcessedDataBatch[i]=data;
+        }
     }
 
     /**
@@ -119,10 +121,12 @@ public class GPU {
      * @pre this.model != null
      * @pre this.ready == false
      * @pre unProcessedDataBatch.size()-1 > indexUPDB
-     * @post this.indexUPDB >= @pre(indexUPDB)
+     * @post this.indexUPDB = @pre(indexUPDB)+1
      */
     public void SendDataBatch(){
-
+        Pair tempPair = new  <DataBatch,Integer> Pair(unProcessedDataBatch[indexUPDB],id);
+        cluster.ReceiveDataFromGpu(tempPair);
+        indexUPDB++;
     }
 
     /**
@@ -133,6 +137,7 @@ public class GPU {
      * @post this.countPDB > @pre(countPDB)
      */
     public void ReceiveProcessedData(DataBatch databatch){
+        processingDataBatch.add(new Pair<DataBatch,Integer>(databatch,timeClock));
     }
 
     /**
@@ -197,7 +202,7 @@ public class GPU {
         return model;
     }
 
-    public Queue<DataBatch> getProcessingDataBatch() {
+    public Queue<Pair<DataBatch,Integer>> getProcessingDataBatch() {
         return processingDataBatch;
     }
 

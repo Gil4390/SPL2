@@ -46,26 +46,30 @@ public class Cluster {
 	}
 
 	public void ReceiveDataFromCpu(Pair<DataBatch,Integer> dataBatchPair, int cpuID){
-		numberOfDataBatchProcessedByCpu ++;
-		GPUs.get(dataBatchPair.getSecond()).ReceiveProcessedData(dataBatchPair.getFirst());
-
-		if(!CPUs.get(cpuID).getSecond().isEmpty())
-			CPUs.get(cpuID).getFirst().ReceiveUnProcessedData(CPUs.get(cpuID).getSecond().remove());
+		GPU tempGPU= GPUs.get(dataBatchPair.getSecond());
+		numberOfDataBatchProcessedByCpu ++; // todo need to solve the problem of thread here
+		synchronized(tempGPU) {
+			tempGPU.ReceiveProcessedData(dataBatchPair.getFirst());
+			if (!CPUs.get(cpuID).getSecond().isEmpty())
+				CPUs.get(cpuID).getFirst().ReceiveUnProcessedData(CPUs.get(cpuID).getSecond().remove());
+		}
 	}
-	public synchronized void ReceiveDataFromGpu(Pair<DataBatch,Integer> dataBatchPair){//todo need to do a better thread save function
+	public void ReceiveDataFromGpu(Pair<DataBatch,Integer> dataBatchPair){//todo need to do a better thread save function
 		Pair<CPU, PriorityQueue<Pair<DataBatch,Integer>>> temp =CPUs.get(cpuRoundIndex);
-		temp.getSecond().add(dataBatchPair);
-		if(!CPUs.get(cpuRoundIndex).getSecond().isEmpty() & CPUs.get(cpuRoundIndex).getFirst().isReady())
-			CPUs.get(cpuRoundIndex).getFirst().ReceiveUnProcessedData(CPUs.get(cpuRoundIndex).getSecond().remove());
-		if(CPUs.size()==cpuRoundIndex)
-			cpuRoundIndex=0;
-		else{
-			cpuRoundIndex++;
+		synchronized(temp) {
+			temp.getSecond().add(dataBatchPair);
+			if (!CPUs.get(cpuRoundIndex).getSecond().isEmpty() & CPUs.get(cpuRoundIndex).getFirst().isReady())
+				CPUs.get(cpuRoundIndex).getFirst().ReceiveUnProcessedData(CPUs.get(cpuRoundIndex).getSecond().remove());
+			if (CPUs.size() == cpuRoundIndex)
+				cpuRoundIndex = 0;
+			else {
+				cpuRoundIndex++;// todo need to solve the problem of thread here
+			}
 		}
 	}
 
 	//for gpu test.
-	public Collection<Object> getDataBATCH_ForCPU() {
+	public Collection<Object> getDataBATCH_ForCPU() {//todo implement this
 		return null;
 	}
 
@@ -83,6 +87,18 @@ public class Cluster {
 		modelNames.add(modelName);
 	}
 
+	public void AddCPUS(Vector<CPU> cpus){
+		for (CPU cpu:cpus) {
+			Pair pair = new Pair(cpu, new PriorityQueue<Pair<DataBatch,Integer>>());
+			CPUs.put(cpu.getId(),pair);
+		}
+	}
+	public void AddGPUS(Vector<GPU> gpus){
+		for (GPU gpu: gpus) {
+			GPUs.put(gpu.getId(),gpu);
+		}
+	}
+
 	public int getNumberOfDataBatchProcessedByCpu(){
 		return numberOfDataBatchProcessedByCpu;
 	}
@@ -95,17 +111,5 @@ public class Cluster {
 	}
 	public Stack<String> getModelNames() {
 		return modelNames;
-	}
-
-	public void AddCPUS(Vector<CPU> cpus){
-		for (CPU cpu:cpus) {
-			Pair pair = new Pair(cpu, new PriorityQueue<Pair<DataBatch,Integer>>());
-			CPUs.put(cpu.getId(),pair);
-		}
-	}
-	public void AddGPUS(Vector<GPU> gpus){
-		for (GPU gpu: gpus) {
-			GPUs.put(gpu.getId(),gpu);
-		}
 	}
 }

@@ -53,7 +53,7 @@ public class Future<T> {
 	public synchronized void resolve (T result) {
 		done = true;
 		this.result=result;
-		notify();
+		notifyAll();
 	}
 	
 	/**
