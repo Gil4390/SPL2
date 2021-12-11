@@ -1,6 +1,8 @@
 package bgu.spl.mics.application.objects;
 
 import Callbacks.Gpu_Callback;
+import bgu.spl.mics.application.services.GPUService;
+
 import java.util.*;
 
 /**
@@ -48,6 +50,8 @@ public class GPU {
         indexUPDB = 0;
         timeClock=0;
         ready=false;
+
+        GPUService gpuService = new GPUService(this);
     }
 
     /**

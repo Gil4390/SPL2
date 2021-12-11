@@ -8,7 +8,7 @@ package bgu.spl.mics.application.objects;
 public class Model {
     private String name;
     private Data data;
-    private Student student;
+    //private Student student;
 
     enum Status {PreTrained, Training, Trained,Tested}
     private Status status;
@@ -16,10 +16,9 @@ public class Model {
     enum Result {None, Good, Bad}
     private Result result;
 
-    public Model(String name, Data data, Student student){
+    public Model(String name, Data data){
         this.name = name;
         this.data = data;
-        this.student = student;
         this.status = Status.PreTrained;
     }
 
@@ -39,13 +38,6 @@ public class Model {
         this.data = data;
     }
 
-    public Student getStudent() {
-        return student;
-    }
-
-    public void setStudent(Student student) {
-        this.student = student;
-    }
 
     public String getStatusString() {
         return status.toString();
@@ -68,7 +60,6 @@ public class Model {
         return "Model{" +
                 "name='" + name + '\'' +
                 ", data=" + data +
-                ", student=" + student +
                 ", status=" + status +
                 '}';
     }

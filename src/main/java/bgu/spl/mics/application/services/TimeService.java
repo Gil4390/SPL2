@@ -1,5 +1,7 @@
 package bgu.spl.mics.application.services;
 
+import bgu.spl.mics.MessageBus;
+import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.TickBroadcast;
 
@@ -15,29 +17,35 @@ import bgu.spl.mics.application.messages.TickBroadcast;
 public class TimeService extends MicroService{
 
 	private int TickCount;
-	private int speed;
+	private long speed;
 	private int duration;
-	private TickBroadcast tickBroadcast;
+	private final MessageBus messageBus;
 
 	public TimeService(int speed, int duration) {
 		super("TimeService");
 		this.speed = speed;
 		this.duration = duration;
+		this.messageBus = MessageBusImpl.getInstance();
 	}
 
 	@Override
 	protected void initialize() {
 		this.TickCount = 1;
-		tickBroadcast = new TickBroadcast();
 		act();
-		
 	}
 
 	private void act(){
+		TickBroadcast tickBroadcast = new TickBroadcast();
 		while(TickCount < duration){
-
-
+			this.messageBus.sendBroadcast(tickBroadcast);
 			TickCount++;
+
+			try {
+				Thread.sleep(speed);
+			}
+			catch (InterruptedException e){
+
+			}
 		}
 	}
 }

@@ -6,12 +6,12 @@ import bgu.spl.mics.application.objects.Model;
 
 public class TrainModelEvent implements Event<Model> {
 
-    private String senderName;
+    private int senderID;
     private Future<Model> future;
     private Model model;
 
-    public TrainModelEvent(String senderName) {
-        this.senderName = senderName;
+    public TrainModelEvent(int senderID) {
+        this.senderID = senderID;
     }
 
     public String getType(){
@@ -22,8 +22,8 @@ public class TrainModelEvent implements Event<Model> {
         return future;
     }
 
-    public String getSenderName() {
-        return senderName;
+    public int getSenderID() {
+        return senderID;
     }
 
     public Model getModel() {

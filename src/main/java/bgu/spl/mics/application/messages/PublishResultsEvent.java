@@ -6,12 +6,13 @@ import bgu.spl.mics.application.objects.Model;
 
 public class PublishResultsEvent implements Event<Model> {
 
-    private String senderName;
+    private int senderID;
     private Future<Model> future;
-    private Model model;
+    private String modelName;
 
-    public PublishResultsEvent(String senderName) {
-        this.senderName = senderName;
+    public PublishResultsEvent(int senderID) {
+        this.senderID = senderID;
+        future = null;
     }
 
     public String getType(){
@@ -22,15 +23,15 @@ public class PublishResultsEvent implements Event<Model> {
         return future;
     }
 
-    public String getSenderName() {
-        return senderName;
+    public int getSenderName() {
+        return senderID;
     }
 
-    public Model getModel() {
-        return model;
+    public String getModelName() {
+        return modelName;
     }
 
-    public void setModel(Model model) {
-        this.model = model;
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
     }
 }

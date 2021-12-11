@@ -1,6 +1,10 @@
 package bgu.spl.mics.application.services;
 
+import bgu.spl.mics.MessageBus;
+import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.messages.TestModelEvent;
+import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.objects.CPU;
 
 /**
@@ -11,12 +15,17 @@ import bgu.spl.mics.application.objects.CPU;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class CPUService extends MicroService {
+
     private CPU cpu;
-    //callback
-    public CPUService(String name, CPU cpu) {
-        super("CPUService- "+name);
-        // TODO Implement this
+    private final MessageBus messageBus;
+
+    public CPUService(CPU cpu) {
+        super("CPU - " + (cpu.getId()) + " Service");
         this.cpu=cpu;
+        this.messageBus = MessageBusImpl.getInstance();
+        this.messageBus.register(this);
+
+        this.messageBus.subscribeBroadcast(TickBroadcast.class, this);
     }
 
     public void tick(){cpu.tickAndCompute();}

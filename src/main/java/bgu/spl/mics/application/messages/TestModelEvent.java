@@ -4,26 +4,26 @@ import bgu.spl.mics.Event;
 import bgu.spl.mics.Future;
 import bgu.spl.mics.application.objects.Model;
 
-public class TestModelEvent implements Event<Model> {
+public class TestModelEvent implements Event<Boolean> {
 
-    private String senderName;
-    private Future<Model> future;
+    private int senderID;
+    private Future<Boolean> future;
     private Model model;
 
-    public TestModelEvent(String senderName) {
-        this.senderName = senderName;
+    public TestModelEvent(int senderID) {
+        this.senderID = senderID;
     }
 
     public String getType(){
         return "Model";
     }
 
-    public Future<Model> getFuture() {
+    public Future<Boolean> getFuture() {
         return future;
     }
 
-    public String getSenderName() {
-        return senderName;
+    public int getSenderID() {
+        return senderID;
     }
 
     public Model getModel() {

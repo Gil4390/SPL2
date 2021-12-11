@@ -1,5 +1,10 @@
 package bgu.spl.mics.application.objects;
 
+import bgu.spl.mics.Future;
+import bgu.spl.mics.application.services.StudentService;
+
+import java.util.PriorityQueue;
+
 /**
  * Passive object representing single student.
  * Add fields and methods to this class as you see fit (including public methods and constructors).
@@ -12,12 +17,16 @@ public class Student {
         MSc, PhD
     }
 
+    private int id;
     private String name;
     private String department;
     private Degree status;
     private int publications;
     private int papersRead;
+    private StudentService studentService;
 
+    private PriorityQueue<Model> models;
+    private PriorityQueue<Model> TrainedModels;
 
     public Student(String name, String department, String degree){
         this.name = name;
@@ -25,8 +34,24 @@ public class Student {
         this.status = FromStringToType(degree);
         publications = 0;
         papersRead = 0;
+        this.studentService = new StudentService(this.getId());
+        this.models = new PriorityQueue<>();
+        this.TrainedModels = new PriorityQueue<>();
     }
 
+    public void AddModel(Model m){
+        this.models.add(m);
+    }
+
+    public void TrainModel(){
+        Model trainedModel = studentService.TrainModel(models.poll());
+        TrainedModels.add(trainedModel);
+    }
+
+    public void TestModel(){
+        Boolean testedModel = studentService.TestModel(TrainedModels.poll());
+        //todo add to publish confernce
+    }
 
     public String getName() {
         return name;
@@ -66,6 +91,22 @@ public class Student {
 
     public void setPapersRead(int papersRead) {
         this.papersRead = papersRead;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public PriorityQueue<Model> getModels() {
+        return models;
+    }
+
+    public PriorityQueue<Model> getTrainedModels() {
+        return TrainedModels;
     }
 
     /**

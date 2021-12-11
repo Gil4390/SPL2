@@ -16,7 +16,7 @@ import java.util.*;
 public class MessageBusImpl implements MessageBus {
 
 	private HashMap<Class<? extends Message>, Queue<MicroService>> event_subscribe; // string = type event
-	private HashMap<Class<? extends Message>,LinkedList<MicroService>> Broadcast_subscribe;
+	private HashMap<Class<? extends Message>, LinkedList<MicroService>> Broadcast_subscribe;
 
 	private HashMap<String, Queue<Message>> microService_queues; // string = microservice name
 

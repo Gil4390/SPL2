@@ -50,6 +50,7 @@ public class CRMSRunner {
             System.out.println(e.getMessage());
         }
 
+        int StudentID = 0;
         students = students.substring(1,students.length()-3);
         for (String str : students.split("]}, ")) {
             String[] str_split1 = str.split("models=");
@@ -58,6 +59,8 @@ public class CRMSRunner {
             String department = str_split[1].substring(11);
             String status = str_split[2].substring(7);
             Student student = new Student(name, department, status);
+            student.setId(StudentID);
+            StudentID++;
             STUDENTS.add(student);
             String[] models = str_split1[1].substring(1, str_split1[1].length()-1).split("}, ");
             for(String m : models){
@@ -70,7 +73,8 @@ public class CRMSRunner {
                 else DataSizeInt = Integer.parseInt(DataSize.substring(0, DataSize.length()-2));
 
                 Data data = new Data(DataType, DataSizeInt);
-                Model model = new Model(modelName, data, student);
+                Model model = new Model(modelName, data);
+                student.AddModel(model);
             }
         }
 
@@ -109,6 +113,8 @@ public class CRMSRunner {
         Cluster cluster = Cluster.getInstance();
         cluster.AddCPUS(CPUS);
         cluster.AddGPUS(GPUS);
+
+
 
         //TODO Create services and register, subscribe
         for (int i = 0; i < STUDENTS.size(); i++) {
