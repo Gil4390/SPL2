@@ -49,9 +49,23 @@ public class GPU {
         model = null;
         indexUPDB = 0;
         timeClock=0;
-        ready=false;
 
         GPUService gpuService = new GPUService(this);
+
+        ready=true;
+    }
+
+    public void TestModel(Model m){
+        ready = false;
+        this.model = m;
+        Random rnd = new Random();
+        if(rnd.nextDouble() < m.getTestProbability()){
+            this.model.setResultString("Good");
+        }
+        else{
+            this.model.setResultString("Bad");
+        }
+
     }
 
     /**
@@ -200,6 +214,10 @@ public class GPU {
 
     public boolean isReady() {
         return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
     }
 
     public Model getModel() {

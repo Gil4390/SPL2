@@ -1,5 +1,8 @@
 package bgu.spl.mics;
 
+
+import bgu.spl.mics.application.services.GPUService;
+
 /**
  * A message is a data-object which is passed between micro-services as a means
  * of communication. The Message interface is a "Marker" interface which means
@@ -8,4 +11,5 @@ package bgu.spl.mics;
  * the {@link MessageBus}) must implement it.
  */
 public interface Message {
+    void act(GPUService m);
 }

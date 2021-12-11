@@ -13,7 +13,7 @@ public class Student {
     /**
      * Enum representing the Degree the student is studying for.
      */
-    enum Degree {
+    public enum Degree {
         MSc, PhD
     }
 
@@ -39,18 +39,35 @@ public class Student {
         this.TrainedModels = new PriorityQueue<>();
     }
 
+    public void act(){
+        for (Model m : this.models){
+            Model model = TrainModel(m);
+            TrainedModels.add(model);
+            if(TestModel(model)){
+                if(PublishModel(model.getName())){
+                    publications++;
+                }
+            }
+        }
+
+    }
+
     public void AddModel(Model m){
         this.models.add(m);
     }
 
-    public void TrainModel(){
-        Model trainedModel = studentService.TrainModel(models.poll());
-        TrainedModels.add(trainedModel);
+    public Model TrainModel(Model model){
+        Model trainedModel = studentService.TrainModel(model);
+        return trainedModel;
     }
 
-    public void TestModel(){
-        Boolean testedModel = studentService.TestModel(TrainedModels.poll());
-        //todo add to publish confernce
+    public Boolean TestModel(Model model){
+        Boolean testedModel = studentService.TestModel(model);
+        return testedModel;
+    }
+
+    public Boolean PublishModel(String name){
+        return studentService.PublishResults(name);
     }
 
     public String getName() {

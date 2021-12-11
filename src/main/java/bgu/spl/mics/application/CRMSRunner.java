@@ -1,6 +1,7 @@
 package bgu.spl.mics.application;
 
 import bgu.spl.mics.application.objects.*;
+import bgu.spl.mics.application.services.TimeService;
 import com.google.gson.Gson;
 
 import java.io.Reader;
@@ -73,7 +74,14 @@ public class CRMSRunner {
                 else DataSizeInt = Integer.parseInt(DataSize.substring(0, DataSize.length()-2));
 
                 Data data = new Data(DataType, DataSizeInt);
-                Model model = new Model(modelName, data);
+                double testProb=0;
+                if(student.getStatus() == Student.Degree.MSc){
+                    testProb = 0.6;
+                }
+                else{
+                    testProb = 0.8;
+                }
+                Model model = new Model(modelName, data, testProb);
                 student.AddModel(model);
             }
         }
@@ -109,17 +117,14 @@ public class CRMSRunner {
 
         DURATION = Integer.parseInt(Duration.substring(0, Duration.length()-2));
 
-
         Cluster cluster = Cluster.getInstance();
         cluster.AddCPUS(CPUS);
         cluster.AddGPUS(GPUS);
 
+        TimeService timeService = new TimeService(TICK_TIME, DURATION);
 
-
-        //TODO Create services and register, subscribe
         for (int i = 0; i < STUDENTS.size(); i++) {
-            //create student service for each student
-            //each studentService will check if the student has models to train, test or publish...
+            STUDENTS.elementAt(i).act();
         }
     }
 }

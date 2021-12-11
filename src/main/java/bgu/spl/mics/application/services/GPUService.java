@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.services;
 
+import bgu.spl.mics.Message;
 import bgu.spl.mics.MessageBus;
 import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
@@ -7,6 +8,7 @@ import bgu.spl.mics.application.messages.TestModelEvent;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.messages.TrainModelEvent;
 import bgu.spl.mics.application.objects.GPU;
+import bgu.spl.mics.application.objects.Model;
 
 /**
  * GPU service is responsible for handling the
@@ -42,11 +44,59 @@ public class GPUService extends MicroService {
     public void tick(){//todo
         gpu.tick();
 
+        if(gpu.isReady()){
+            try {
+                Message message =  this.messageBus.awaitMessage(this);
+                act(message);
+            }
+            catch (InterruptedException ex){
 
-
-        if(gpu.getCountPDB()==gpu.getUnProcessedDataBatch().length) {
-            gpu.Finish();
+            }
+            catch (IllegalArgumentException e){
+                //TODO throw exception?
+            }
         }
+        else{
+            while(gpu.getUnProcessedDataBatch()!=null && gpu.getCountPDB() < gpu.getUnProcessedDataBatch().length) {
+                while (gpu.getIndexUPDB() < gpu.getCapacity()) {
+                    gpu.SendDataBatch();
+                }
+                gpu.TrainModel();
+            }
+
+            if(gpu.getUnProcessedDataBatch()!=null && gpu.getCountPDB()==gpu.getUnProcessedDataBatch().length) {
+                gpu.Finish();
+            }
+        }
+
+
+    }
+
+    public void act(Message m){
+       m.act(this);
+    }
+
+    public void act(TrainModelEvent e){
+        TrainModel(e.getModel());
+    }
+
+    public void act(TestModelEvent e){
+        TestModel(e.getModel());
+    }
+
+    public void TrainModel(Model m){
+        gpu.setReady(false);
+        gpu.setModel(m);
+        gpu.DivideDataBatch();
+
+
+    }
+
+    public void TestModel(Model model){
+        gpu.TestModel(model);
+        gpu.Finish();
+
+        //TODO await?
     }
 
     public GPU getGpu() {

@@ -9,6 +9,7 @@ public class Model {
     private String name;
     private Data data;
     //private Student student;
+    private double TestProbability;
 
     enum Status {PreTrained, Training, Trained,Tested}
     private Status status;
@@ -16,10 +17,12 @@ public class Model {
     enum Result {None, Good, Bad}
     private Result result;
 
-    public Model(String name, Data data){
+    public Model(String name, Data data, double testProbability){
         this.name = name;
         this.data = data;
         this.status = Status.PreTrained;
+        this.TestProbability = testProbability;
+        this.result = Result.None;
     }
 
     public String getName() {
@@ -53,6 +56,10 @@ public class Model {
 
     public void setResultString(String result) {
         this.result = FromStringToResult(result);
+    }
+
+    public double getTestProbability() {
+        return TestProbability;
     }
 
     @Override

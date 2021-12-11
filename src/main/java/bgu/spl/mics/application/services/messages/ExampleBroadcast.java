@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.services.messages;
 
 import bgu.spl.mics.Broadcast;
+import bgu.spl.mics.application.services.GPUService;
 
 public class ExampleBroadcast implements Broadcast {
 
@@ -16,6 +17,10 @@ public class ExampleBroadcast implements Broadcast {
 
     public String getSenderId() {
         return senderId;
+    }
+    @Override
+    public void act(GPUService m) {
+
     }
 
 }

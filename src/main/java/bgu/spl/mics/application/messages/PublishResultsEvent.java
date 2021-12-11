@@ -3,23 +3,25 @@ package bgu.spl.mics.application.messages;
 import bgu.spl.mics.Event;
 import bgu.spl.mics.Future;
 import bgu.spl.mics.application.objects.Model;
+import bgu.spl.mics.application.services.GPUService;
 
-public class PublishResultsEvent implements Event<Model> {
+public class PublishResultsEvent implements Event<Boolean> {
 
     private int senderID;
-    private Future<Model> future;
+    private Future<Boolean> future;
     private String modelName;
 
-    public PublishResultsEvent(int senderID) {
+    public PublishResultsEvent(int senderID, String name) {
         this.senderID = senderID;
-        future = null;
+        this.modelName = name;
+        future = new Future<>();
     }
 
     public String getType(){
         return "Model";
     }
 
-    public Future<Model> getFuture() {
+    public Future<Boolean> getFuture() {
         return future;
     }
 
@@ -33,5 +35,10 @@ public class PublishResultsEvent implements Event<Model> {
 
     public void setModelName(String modelName) {
         this.modelName = modelName;
+    }
+
+    @Override
+    public void act(GPUService m) {
+
     }
 }

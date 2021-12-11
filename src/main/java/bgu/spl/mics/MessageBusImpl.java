@@ -131,7 +131,7 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public Message awaitMessage(MicroService m) throws InterruptedException {
 		if(!isRegistered(m))
-			throw new IllegalStateException();
+			throw new IllegalArgumentException();
 		if(microService_queues.get(m.getName()).isEmpty())
 			wait();
 

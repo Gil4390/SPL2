@@ -36,19 +36,19 @@ public class StudentService extends MicroService {
     }
 
     public Model TrainModel(Model model){
-        TrainModelEvent trainEvent = new TrainModelEvent(this.studentID);
+        TrainModelEvent trainEvent = new TrainModelEvent(this.studentID, model);
         messageBus.sendEvent(trainEvent);
         return trainEvent.getFuture().get();
     }
 
     public Boolean TestModel(Model model){
-        TestModelEvent testEvent = new TestModelEvent(this.studentID);
+        TestModelEvent testEvent = new TestModelEvent(this.studentID, model);
         messageBus.sendEvent(testEvent);
         return testEvent.getFuture().get();
     }
 
-    public Future<Model> PublishResults(Model model){
-        PublishResultsEvent publishEvent = new PublishResultsEvent(this.studentID);
-        return publishEvent.getFuture();
+    public Boolean PublishResults(String name){
+        PublishResultsEvent publishEvent = new PublishResultsEvent(this.studentID, name);
+        return publishEvent.getFuture().get();
     }
 }

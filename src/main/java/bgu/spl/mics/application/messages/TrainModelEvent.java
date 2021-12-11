@@ -3,6 +3,7 @@ package bgu.spl.mics.application.messages;
 import bgu.spl.mics.Event;
 import bgu.spl.mics.Future;
 import bgu.spl.mics.application.objects.Model;
+import bgu.spl.mics.application.services.GPUService;
 
 public class TrainModelEvent implements Event<Model> {
 
@@ -10,8 +11,10 @@ public class TrainModelEvent implements Event<Model> {
     private Future<Model> future;
     private Model model;
 
-    public TrainModelEvent(int senderID) {
+    public TrainModelEvent(int senderID, Model model) {
         this.senderID = senderID;
+        this.model = model;
+        future = new Future<>();
     }
 
     public String getType(){
@@ -32,5 +35,10 @@ public class TrainModelEvent implements Event<Model> {
 
     public void setModel(Model model) {
         this.model = model;
+    }
+
+    @Override
+    public void act(GPUService m) {
+        m.act(this);
     }
 }

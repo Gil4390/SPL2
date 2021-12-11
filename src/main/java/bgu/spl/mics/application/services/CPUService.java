@@ -28,7 +28,9 @@ public class CPUService extends MicroService {
         this.messageBus.subscribeBroadcast(TickBroadcast.class, this);
     }
 
-    public void tick(){cpu.tickAndCompute();}
+    public void tick(){
+        cpu.tickAndCompute();
+    }
 
     @Override
     protected void initialize() {
