@@ -21,82 +21,59 @@ import bgu.spl.mics.application.objects.Model;
 public class GPUService extends MicroService {
 
     private GPU gpu;
-    private final MessageBus messageBus;
 
     public GPUService(GPU gpu) {
         super("GPU - " + (gpu.getId()) + " Service");
-        this.gpu = gpu;
-        this.messageBus = MessageBusImpl.getInstance();
-        this.messageBus.register(this);
-
-        this.messageBus.subscribeEvent(TrainModelEvent.class, this);
-        this.messageBus.subscribeEvent(TestModelEvent.class, this);
-
-        this.messageBus.subscribeBroadcast(TickBroadcast.class, this);
+        this.gpu = gpu;//todo check where to active the run methode, from here or from main and then we need to create the services in mein
     }
 
     @Override
     protected void initialize() {
-        // TODO Implement this
-
+        subscribeEvent(TrainModelEvent.class, (TrainModelEvent)->{
+            Model model = TrainModelEvent.getModel();
+            StartTrainModel(model);});
+        subscribeEvent(TestModelEvent.class, (TestModelEvent)->{Model model = TestModelEvent.getModel();
+            TestModel(model);});
+        subscribeBroadcast(TickBroadcast.class, (TickBroadcast)->{tick();});
     }
 
-    public void tick(){//todo
+    private void tick(){
         gpu.tick();
+        notifyAll();
+    }
 
-        if(gpu.isReady()){
-            try {
-                Message message =  this.messageBus.awaitMessage(this);
-                act(message);
-            }
-            catch (InterruptedException ex){
+    private void StartTrainModel(Model m){
+        gpu.setReady(false);
+        gpu.setModel(m);
+        gpu.DivideDataBatch();
+        ContinueTrainModel();
+    }
 
-            }
-            catch (IllegalArgumentException e){
-                //TODO throw exception?
-            }
-        }
-        else{
+    private void ContinueTrainModel(){
+        if(!gpu.isReady()){
             while(gpu.getUnProcessedDataBatch()!=null && gpu.getCountPDB() < gpu.getUnProcessedDataBatch().length) {
-                while (gpu.getIndexUPDB() < gpu.getCapacity()) {
+                while (gpu.getProcessingDataBatch().size() < gpu.getCapacity()) {
                     gpu.SendDataBatch();
                 }
                 gpu.TrainModel();
             }
-
             if(gpu.getUnProcessedDataBatch()!=null && gpu.getCountPDB()==gpu.getUnProcessedDataBatch().length) {
                 gpu.Finish();
             }
+            else{//todo this wait is not good, need to think how to make tick and train model run together
+                try{
+                    wait();
+                }
+                catch (InterruptedException e){}
+                ContinueTrainModel();
+            }
         }
-
-
     }
 
-    public void act(Message m){
-       m.act(this);
-    }
-
-    public void act(TrainModelEvent e){
-        TrainModel(e.getModel());
-    }
-
-    public void act(TestModelEvent e){
-        TestModel(e.getModel());
-    }
-
-    public void TrainModel(Model m){
-        gpu.setReady(false);
-        gpu.setModel(m);
-        gpu.DivideDataBatch();
-
-
-    }
-
-    public void TestModel(Model model){
+    private void TestModel(Model model){
         gpu.TestModel(model);
         gpu.Finish();
-
-        //TODO await?
+        //TODO need to notify that model result changed
     }
 
     public GPU getGpu() {

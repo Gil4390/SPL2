@@ -1,5 +1,6 @@
 package bgu.spl.mics;
 
+import java.util.HashMap;
 import java.util.Stack;
 
 /**
@@ -21,10 +22,11 @@ import java.util.Stack;
  * <p>
  */
 public abstract class MicroService implements Runnable {
+    private HashMap<Class<? extends Message>, Callback<? extends Message>> callbackMap;
 
     private boolean terminated = false;
     private final String name;
-    //private Stack subEvenets;
+    private MessageBusImpl messageBus;
 
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
@@ -32,6 +34,8 @@ public abstract class MicroService implements Runnable {
      */
     public MicroService(String name) {
         this.name = name;
+        callbackMap=new HashMap<>();
+        messageBus=MessageBusImpl.getInstance();
     }
 
     /**
@@ -56,7 +60,8 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
-        //TODO: implement this.
+        messageBus.subscribeEvent(type,this);
+        callbackMap.put(type,callback);
     }
 
     /**
@@ -80,7 +85,8 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <B extends Broadcast> void subscribeBroadcast(Class<B> type, Callback<B> callback) {
-        //TODO: implement this.
+        messageBus.subscribeBroadcast(type,this);
+        callbackMap.put(type,callback);
     }
 
     /**
@@ -107,7 +113,7 @@ public abstract class MicroService implements Runnable {
      * @param b The broadcast message to send
      */
     protected final void sendBroadcast(Broadcast b) {
-        //TODO: implement this.
+        messageBus.sendBroadcast(b);
     }
 
     /**
@@ -151,10 +157,16 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
+        messageBus.register(this);
         initialize();
         while (!terminated) {
-            System.out.println("NOT IMPLEMENTED!!!"); //TODO: you should delete this line :)
+            try{
+                Message message =  messageBus.awaitMessage(this);
+                callbackMap.get(message.getClass()).call(message);
+            }
+            catch (InterruptedException e){}
+            // HASHMAP(M.GETCLASS).CALL(M);
         }
+        messageBus.unregister(this);
     }
-
 }

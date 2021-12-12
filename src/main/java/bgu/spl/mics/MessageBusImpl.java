@@ -20,10 +20,6 @@ public class MessageBusImpl implements MessageBus {
 
 	private HashMap<String, Queue<Message>> microService_queues; // string = microservice name
 
-	//private Stack<StudentService> Students;
-
-	//private Stack<List<String>> conferenceEvent;
-
 	private TimeService timeService;
 
 	private ConferenceService conference;
@@ -78,6 +74,7 @@ public class MessageBusImpl implements MessageBus {
 		LinkedList<MicroService> list = Broadcast_subscribe.get(b);
 		for (MicroService m:list) {
 			microService_queues.get(m.getName()).add(b);
+			microService_queues.notifyAll();
 		}
 	}
 
@@ -90,6 +87,7 @@ public class MessageBusImpl implements MessageBus {
 		Queue<MicroService> queue = event_subscribe.get(e);
 		MicroService m = queue.poll();
 		microService_queues.get(m.getName()).add(e);
+		microService_queues.notifyAll();
 		queue.add(m);
 		return e.getFuture();
 	}
@@ -133,7 +131,7 @@ public class MessageBusImpl implements MessageBus {
 		if(!isRegistered(m))
 			throw new IllegalArgumentException();
 		if(microService_queues.get(m.getName()).isEmpty())
-			wait();
+			microService_queues.wait();
 
 		return microService_queues.get(m.getName()).poll();
 	}

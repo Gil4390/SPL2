@@ -19,13 +19,11 @@ public class TimeService extends MicroService{
 	private int TickCount;
 	private long speed;
 	private int duration;
-	private final MessageBus messageBus;
 
 	public TimeService(int speed, int duration) {
 		super("TimeService");
 		this.speed = speed;
 		this.duration = duration;
-		this.messageBus = MessageBusImpl.getInstance();
 	}
 
 	@Override
@@ -37,11 +35,10 @@ public class TimeService extends MicroService{
 	private void act(){
 		TickBroadcast tickBroadcast = new TickBroadcast();
 		while(TickCount < duration){
-			this.messageBus.sendBroadcast(tickBroadcast);
+			sendBroadcast(tickBroadcast);
 			TickCount++;
-
 			try {
-				Thread.sleep(speed);
+				Thread.sleep(speed);//todo replace with timer
 			}
 			catch (InterruptedException e){
 

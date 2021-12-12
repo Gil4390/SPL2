@@ -23,25 +23,20 @@ import java.util.PriorityQueue;
 public class ConferenceService extends MicroService {
 
     private ConfrenceInformation conf;
-    private final MessageBus messageBus;
     private PriorityQueue<String> succesfulModels;
+    int date;
 
     public ConferenceService(ConfrenceInformation conf) {
         super("Conference - " + conf.getName() + " Service");
         this.conf = conf;
-        this.messageBus = MessageBusImpl.getInstance();
-        this.messageBus.register(this);
         this.succesfulModels = new PriorityQueue<>();
-
-        this.messageBus.subscribeEvent(PublishResultsEvent.class, this);
-
-        this.messageBus.subscribeBroadcast(TickBroadcast.class, this);
+        date=0;
     }
 
     @Override
     protected void initialize() {
-        // TODO Implement this
-
+        subscribeEvent(PublishResultsEvent.class, (PublishResultsEvent)->{PublishResults(PublishResultsEvent.getModelName());});
+        subscribeBroadcast(TickBroadcast.class, (TickBroadcast)->{PublishConference();});
     }
 
     public void PublishResults(String modelName){
@@ -49,9 +44,11 @@ public class ConferenceService extends MicroService {
     }
 
     public void PublishConference(){
-        PublishConferenceBroadcast publish = new PublishConferenceBroadcast(this.succesfulModels);
-        this.messageBus.sendBroadcast(publish);
-
-        this.messageBus.unregister(this);
+        date++;
+        if(date==conf.getDate()) {
+            PublishConferenceBroadcast publish = new PublishConferenceBroadcast(this.succesfulModels);
+            sendBroadcast(publish);
+            this.terminate();
+        }
     }
 }

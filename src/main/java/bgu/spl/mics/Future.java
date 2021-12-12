@@ -34,7 +34,7 @@ public class Future<T> {
 			return result;
 		else{
 			try{
-				wait();
+				wait();//todo check if need to put in while..... while(!done){wait()};
 			}
 			catch (InterruptedException e){}
 		}

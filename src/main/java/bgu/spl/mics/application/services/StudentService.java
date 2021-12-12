@@ -18,32 +18,28 @@ import bgu.spl.mics.application.objects.Model;
  */
 public class StudentService extends MicroService {
 
-    private final MessageBus messageBus;
     private int studentID;
 
     public StudentService(int id) {
         super("Student - " + id + " Service");
         this.studentID = id;
-        this.messageBus = MessageBusImpl.getInstance();
-        this.messageBus.register(this);
 
-        this.messageBus.subscribeBroadcast(PublishConferenceBroadcast.class, this);
     }
 
     @Override
     protected void initialize() {
-        // TODO Implement this
+        subscribeBroadcast(PublishConferenceBroadcast.class, (PublishConferenceBroadcast)->{});//todo need to implement this
     }
 
     public Model TrainModel(Model model){
         TrainModelEvent trainEvent = new TrainModelEvent(this.studentID, model);
-        messageBus.sendEvent(trainEvent);
+        sendEvent(trainEvent);
         return trainEvent.getFuture().get();
     }
 
     public Boolean TestModel(Model model){
         TestModelEvent testEvent = new TestModelEvent(this.studentID, model);
-        messageBus.sendEvent(testEvent);
+        sendEvent(testEvent);
         return testEvent.getFuture().get();
     }
 

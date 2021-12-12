@@ -11,5 +11,5 @@ import bgu.spl.mics.application.services.GPUService;
  * the {@link MessageBus}) must implement it.
  */
 public interface Message {
-    void act(GPUService m);
+    //void act(GPUService m);
 }
