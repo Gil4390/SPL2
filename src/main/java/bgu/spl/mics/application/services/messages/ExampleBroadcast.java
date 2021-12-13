@@ -18,9 +18,5 @@ public class ExampleBroadcast implements Broadcast {
     public String getSenderId() {
         return senderId;
     }
-    @Override
-    public void act(GPUService m) {
-
-    }
 
 }

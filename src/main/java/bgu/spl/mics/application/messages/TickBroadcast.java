@@ -7,9 +7,4 @@ public class TickBroadcast implements Broadcast {
 
     public TickBroadcast() {
     }
-
-    @Override
-    public void act(GPUService m) {
-
-    }
 }

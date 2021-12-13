@@ -16,9 +16,4 @@ public class PublishConferenceBroadcast implements Broadcast {
             this.modelNames[i] = modelNames.poll();
         }
     }
-
-    @Override
-    public void act(GPUService m) {
-
-    }
 }

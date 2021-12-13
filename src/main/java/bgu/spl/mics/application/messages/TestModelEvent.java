@@ -36,9 +36,4 @@ public class TestModelEvent implements Event<Boolean> {
     public void setModel(Model model) {
         this.model = model;
     }
-
-    @Override
-    public void act(GPUService m) {
-        m.act(this);
-    }
 }

@@ -36,9 +36,4 @@ public class PublishResultsEvent implements Event<Boolean> {
     public void setModelName(String modelName) {
         this.modelName = modelName;
     }
-
-    @Override
-    public void act(GPUService m) {
-
-    }
 }

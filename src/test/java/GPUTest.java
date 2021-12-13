@@ -28,10 +28,10 @@ class GPUTest {
         DataBatch DB2 = new DataBatch(1000,data);
         DataBatch DB3 = new DataBatch(2000,data);
         DataBatch DB4 = new DataBatch(3000,data);
-        Model m = new Model("testModel",data, new Student("amit","a","PhD"));
-        gpu.setModel(m);
-        gpu.DivideDataBatch();
-        gpu.SendDataBatch();
+        Model m = new Model("testModel",data, 0.8);
+        //gpu.setModel(m);
+        //gpu.DivideDataBatch();
+        //gpu.SendDataBatch();
         gpu.ReceiveProcessedData(DB1);
         gpu.ReceiveProcessedData(DB2);
         gpu.ReceiveProcessedData(DB3);
@@ -66,14 +66,14 @@ class GPUTest {
     void finish() {
         Data data = new Data("Text", 2000);
         DataBatch DB = new DataBatch(0,data);
-        Model m = new Model("testModel",data, new Student("amit","a","PhD"));
-        gpu.setModel(m);
-        gpu.DivideDataBatch();
-        gpu.SendDataBatch();
-        gpu.ReceiveProcessedData(DB);
+        Model m = new Model("testModel",data, 0.8);
+        //gpu.setModel(m);
+        //gpu.DivideDataBatch();
+        //gpu.SendDataBatch();
+        //gpu.ReceiveProcessedData(DB);
         for(int i=0; i<4; i++)
             gpu.tick();
-        gpu.Finish();
+        //gpu.Finish();
         assertNull(gpu.getModel());
         assertEquals(0,gpu.getProcessingDataBatch().size());
         assertEquals(0,gpu.getUnProcessedDataBatch().length);
@@ -88,17 +88,17 @@ class GPUTest {
         int size = gpu.getUnProcessedDataBatch().length;
         assertEquals(size,0);
         Data data = new Data("Text", 2000);
-        Model m = new Model("testModel",data, new Student("amit","a","PhD"));
-        gpu.setModel(m);
-        gpu.DivideDataBatch();
+        Model m = new Model("testModel",data,0.6);
+        //gpu.setModel(m);
+        //gpu.DivideDataBatch();
         size = gpu.getUnProcessedDataBatch().length;
         assertEquals(size,2);
 
         Data data2 = new Data("Text", 2500);
-        m=new Model("testModel",data, new Student("amit","a","PhD"));
+        m=new Model("testModel",data, 0.8);
         gpu=new GPU("RTX3090", Cluster.getInstance());
-        gpu.setModel(m);
-        gpu.DivideDataBatch();
+        //gpu.setModel(m);
+        //gpu.DivideDataBatch();
         size = gpu.getUnProcessedDataBatch().length;
         assertEquals(size,3);
     }
@@ -108,7 +108,7 @@ class GPUTest {
         Cluster cluster = Cluster.getInstance();
         int size= cluster.getDataBATCH_ForCPU().size();
         assertEquals(size,0);
-        gpu.SendDataBatch();
+        //gpu.SendDataBatch();
         size= cluster.getDataBATCH_ForCPU().size();
         assertNotEquals(0,size);
     }
