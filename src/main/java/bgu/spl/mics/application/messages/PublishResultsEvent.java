@@ -25,7 +25,7 @@ public class PublishResultsEvent implements Event<Boolean> {
         return future;
     }
 
-    public int getSenderName() {
+    public int getSenderId() {
         return senderID;
     }
 

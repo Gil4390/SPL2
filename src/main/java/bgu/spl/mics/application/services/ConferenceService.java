@@ -8,6 +8,7 @@ import bgu.spl.mics.application.messages.PublishResultsEvent;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.messages.TrainModelEvent;
 import bgu.spl.mics.application.objects.ConfrenceInformation;
+import bgu.spl.mics.application.objects.Pair;
 
 import java.util.PriorityQueue;
 
@@ -23,7 +24,7 @@ import java.util.PriorityQueue;
 public class ConferenceService extends MicroService {
 
     private ConfrenceInformation conf;
-    private PriorityQueue<String> succesfulModels;
+    private PriorityQueue<Pair<String,Integer>> succesfulModels;
     int date;
 
     public ConferenceService(ConfrenceInformation conf) {
@@ -35,12 +36,12 @@ public class ConferenceService extends MicroService {
 
     @Override
     protected void initialize() {
-        subscribeEvent(PublishResultsEvent.class, (PublishResultsEvent)->{PublishResults(PublishResultsEvent.getModelName());});
+        subscribeEvent(PublishResultsEvent.class, (PublishResultsEvent)->{PublishResults(PublishResultsEvent.getModelName(),PublishResultsEvent.getSenderId());});
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast)->{PublishConference();});
     }
 
-    public void PublishResults(String modelName){
-        this.succesfulModels.add(modelName);
+    public void PublishResults(String modelName, int id){
+        this.succesfulModels.add(new Pair(modelName, id));
     }
 
     public void PublishConference(){

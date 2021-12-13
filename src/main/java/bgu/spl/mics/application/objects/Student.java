@@ -34,7 +34,7 @@ public class Student {
         this.status = FromStringToType(degree);
         publications = 0;
         papersRead = 0;
-        this.studentService = new StudentService(this.getId());
+        this.studentService = new StudentService(this);
         this.models = new PriorityQueue<>();
         this.TrainedModels = new PriorityQueue<>();
 

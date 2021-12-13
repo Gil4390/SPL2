@@ -16,7 +16,7 @@ import java.util.Timer;
  * You can add private fields and public methods to this class.
  * You MAY change constructor signatures and even add new public constructors.
  */
-public class TimeService extends MicroService{
+public class TimeService extends MicroService {
 
 	private int TickCount;
 	private long speed;
@@ -34,16 +34,14 @@ public class TimeService extends MicroService{
 		act();
 	}
 
-	private void act(){
+	private void act() {
 		TickBroadcast tickBroadcast = new TickBroadcast();
-		while(TickCount < duration){
+		while (TickCount < duration) {
 			sendBroadcast(tickBroadcast);
 			TickCount++;
 			try {
 				Thread.sleep(speed);//todo replace with timer
-			}
-			catch (InterruptedException e){
-
+			} catch (InterruptedException e) {//todo terminate all}
 			}
 		}
 	}

@@ -6,6 +6,8 @@ import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.*;
 import bgu.spl.mics.application.objects.Model;
+import bgu.spl.mics.application.objects.Pair;
+import bgu.spl.mics.application.objects.Student;
 
 /**
  * Student is responsible for sending the {@link TrainModelEvent},
@@ -18,11 +20,11 @@ import bgu.spl.mics.application.objects.Model;
  */
 public class StudentService extends MicroService {
 
-    private int studentID;
+    private Student student;
 
-    public StudentService(int id) {
-        super("Student - " + id + " Service");
-        this.studentID = id;
+    public StudentService(Student student) {
+        super("Student - " + student.getId() + " Service");
+        this.student = student;
 
     }
 
@@ -32,23 +34,29 @@ public class StudentService extends MicroService {
     }
 
     public Model TrainModel(Model model){
-        TrainModelEvent trainEvent = new TrainModelEvent(this.studentID, model);
+        TrainModelEvent trainEvent = new TrainModelEvent(this.student.getId(), model);
         sendEvent(trainEvent);
         return trainEvent.getFuture().get();
     }
 
     public Boolean TestModel(Model model){
-        TestModelEvent testEvent = new TestModelEvent(this.studentID, model);
+        TestModelEvent testEvent = new TestModelEvent(this.student.getId(), model);
         sendEvent(testEvent);
         return testEvent.getFuture().get();
     }
 
     public Boolean PublishResults(String name){
-        PublishResultsEvent publishEvent = new PublishResultsEvent(this.studentID, name);
+        PublishResultsEvent publishEvent = new PublishResultsEvent(this.student.getId(), name);
         return publishEvent.getFuture().get();
     }
 
     private void PublishConferenceBroadcast(PublishConferenceBroadcast event){
-
+        for (Pair<String,Integer> pair:event.getModels()) {
+            if(student.getId()==pair.getSecond())
+                student.setPublications(student.getPublications()+1);
+            else{
+                student.setPapersRead(student.getPapersRead()+1);
+            }
+        }
     }
 }
