@@ -37,6 +37,8 @@ public class Student {
         this.studentService = new StudentService(this.getId());
         this.models = new PriorityQueue<>();
         this.TrainedModels = new PriorityQueue<>();
+
+        studentService.run();
     }
 
     public void act(){

@@ -1,6 +1,9 @@
 package bgu.spl.mics.application;
 
 import bgu.spl.mics.application.objects.*;
+import bgu.spl.mics.application.services.CPUService;
+import bgu.spl.mics.application.services.ConferenceService;
+import bgu.spl.mics.application.services.GPUService;
 import bgu.spl.mics.application.services.TimeService;
 import com.google.gson.Gson;
 
@@ -93,6 +96,8 @@ public class CRMSRunner {
             gpu.setId(GPU_ID);
             GPU_ID++;
             GPUS.add(gpu);
+            GPUService gpuService = new GPUService(gpu);
+            gpuService.run();
         }
 
         int CPU_ID = 0;
@@ -102,6 +107,8 @@ public class CRMSRunner {
             cpu.setId(CPU_ID);
             CPU_ID++;
             CPUS.add(cpu);
+            CPUService cpuService = new CPUService(cpu);
+            cpuService.run();
         }
 
         conferences = conferences.substring(1,conferences.length()-2);
@@ -111,6 +118,8 @@ public class CRMSRunner {
             int cDateInt = Integer.parseInt(cDate.substring(0, cDate.length()-2));
             ConfrenceInformation conference = new ConfrenceInformation(cName, cDateInt);
             CONFERENCES.add(conference);
+            ConferenceService conferenceService = new ConferenceService(conference);
+            conferenceService.run();
         }
 
         TICK_TIME = Integer.parseInt(TickTime.substring(0, TickTime.length()-2));
