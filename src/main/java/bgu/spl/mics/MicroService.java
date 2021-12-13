@@ -1,6 +1,8 @@
 package bgu.spl.mics;
 
 import java.util.HashMap;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Stack;
 
 /**
@@ -22,8 +24,7 @@ import java.util.Stack;
  * <p>
  */
 public abstract class MicroService implements Runnable {
-    private HashMap<Class<? extends Message>, Callback<? extends Message>> callbackMap;
-
+    private HashMap<Class<? extends Message>, Callback> callbackMap;
     private boolean terminated = false;
     private final String name;
     private MessageBusImpl messageBus;
@@ -36,6 +37,7 @@ public abstract class MicroService implements Runnable {
         this.name = name;
         callbackMap=new HashMap<>();
         messageBus=MessageBusImpl.getInstance();
+        messageQueue= new PriorityQueue<>();
     }
 
     /**
@@ -160,12 +162,11 @@ public abstract class MicroService implements Runnable {
         messageBus.register(this);
         initialize();
         while (!terminated) {
-            try{
-                Message message =  messageBus.awaitMessage(this);
+            try {
+                Message message = messageBus.awaitMessage(this);
                 callbackMap.get(message.getClass()).call(message);
-            }
-            catch (InterruptedException e){}
-            // HASHMAP(M.GETCLASS).CALL(M);
+            } catch (InterruptedException e) {}
+
         }
         messageBus.unregister(this);
     }

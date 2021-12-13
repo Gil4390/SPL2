@@ -1,14 +1,15 @@
 package bgu.spl.mics.application.services;
 
-import bgu.spl.mics.Message;
-import bgu.spl.mics.MessageBus;
-import bgu.spl.mics.MessageBusImpl;
-import bgu.spl.mics.MicroService;
+import bgu.spl.mics.*;
 import bgu.spl.mics.application.messages.TestModelEvent;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.messages.TrainModelEvent;
 import bgu.spl.mics.application.objects.GPU;
 import bgu.spl.mics.application.objects.Model;
+import bgu.spl.mics.application.objects.Pair;
+
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * GPU service is responsible for handling the
@@ -21,59 +22,62 @@ import bgu.spl.mics.application.objects.Model;
 public class GPUService extends MicroService {
 
     private GPU gpu;
+    private Queue<Pair<TrainModelEvent,Integer>> TrainModelEventQueue;
+    private Queue<Pair<TestModelEvent,Integer>> TestModelEventQueue;
+    int clock;
 
     public GPUService(GPU gpu) {
         super("GPU - " + (gpu.getId()) + " Service");
-        this.gpu = gpu;//todo check where to active the run methode, from here or from main and then we need to create the services in mein
+        this.gpu = gpu;
+        TrainModelEventQueue = new PriorityQueue<>();
+        TestModelEventQueue = new PriorityQueue<>();
+        clock=0;
     }
 
     @Override
     protected void initialize() {
-        subscribeEvent(TrainModelEvent.class, (TrainModelEvent)->{
-            Model model = TrainModelEvent.getModel();
-            StartTrainModel(model);});
-        subscribeEvent(TestModelEvent.class, (TestModelEvent)->{Model model = TestModelEvent.getModel();
-            TestModel(model);});
+        subscribeEvent(TrainModelEvent.class, (TrainModelEvent)->{TrainModelEvent(TrainModelEvent);});
+        subscribeEvent(TestModelEvent.class, (TestModelEvent)->{TestModel(TestModelEvent);});
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast)->{tick();});
     }
 
     private void tick(){
+        clock++;
         gpu.tick();
-        notifyAll();
+        nextEvent();
     }
 
-    private void StartTrainModel(Model m){
-        gpu.setReady(false);
-        gpu.setModel(m);
-        gpu.DivideDataBatch();
-        ContinueTrainModel();
-    }
-
-    private void ContinueTrainModel(){
-        if(!gpu.isReady()){
-            while(gpu.getUnProcessedDataBatch()!=null && gpu.getCountPDB() < gpu.getUnProcessedDataBatch().length) {
-                while (gpu.getProcessingDataBatch().size() < gpu.getCapacity()) {
-                    gpu.SendDataBatch();
-                }
-                gpu.TrainModel();
-            }
-            if(gpu.getUnProcessedDataBatch()!=null && gpu.getCountPDB()==gpu.getUnProcessedDataBatch().length) {
-                gpu.Finish();
-            }
-            else{//todo this wait is not good, need to think how to make tick and train model run together
-                try{
-                    wait();
-                }
-                catch (InterruptedException e){}
-                ContinueTrainModel();
-            }
+    private void TrainModelEvent(TrainModelEvent event){
+        if(!gpu.isReady()) {
+            Pair <TrainModelEvent,Integer> pair = new Pair(event,clock);
+            TrainModelEventQueue.add(pair);
+        }
+        else {
+            gpu.TrainModelEvent(event.getModel());
         }
     }
 
-    private void TestModel(Model model){
-        gpu.TestModel(model);
-        gpu.Finish();
-        //TODO need to notify that model result changed
+    private void TestModel(TestModelEvent event){
+        if(!gpu.isReady()){
+            Pair <TestModelEvent,Integer> pair = new Pair(event,clock);
+            TestModelEventQueue.add(pair);
+        }
+        else {
+            gpu.TestModel(event.getModel());
+            //TODO need to notify that model result changed
+            nextEvent();
+        }
+    }
+
+    public void nextEvent(){
+        if(TrainModelEventQueue.isEmpty() && !TestModelEventQueue.isEmpty())
+            TestModel(TestModelEventQueue.poll().getFirst());
+        else if(!TrainModelEventQueue.isEmpty() && TestModelEventQueue.isEmpty())
+            TrainModelEvent(TrainModelEventQueue.poll().getFirst());
+        else if(!TrainModelEventQueue.isEmpty() && (TrainModelEventQueue.peek().getSecond() <= TestModelEventQueue.peek().getSecond()))
+            TrainModelEvent(TrainModelEventQueue.poll().getFirst());
+        else if(!TestModelEventQueue.isEmpty())
+            TestModel(TestModelEventQueue.poll().getFirst());
     }
 
     public GPU getGpu() {

@@ -28,7 +28,7 @@ public class StudentService extends MicroService {
 
     @Override
     protected void initialize() {
-        subscribeBroadcast(PublishConferenceBroadcast.class, (PublishConferenceBroadcast)->{});//todo need to implement this
+        subscribeBroadcast(PublishConferenceBroadcast.class, (PublishConferenceBroadcast)->PublishConferenceBroadcast(PublishConferenceBroadcast));//todo need to implement this
     }
 
     public Model TrainModel(Model model){
@@ -46,5 +46,9 @@ public class StudentService extends MicroService {
     public Boolean PublishResults(String name){
         PublishResultsEvent publishEvent = new PublishResultsEvent(this.studentID, name);
         return publishEvent.getFuture().get();
+    }
+
+    private void PublishConferenceBroadcast(PublishConferenceBroadcast event){
+
     }
 }

@@ -51,7 +51,6 @@ public class GPU {
         timeClock=0;
 
         GPUService gpuService = new GPUService(this);
-
         ready=true;
     }
 
@@ -65,7 +64,7 @@ public class GPU {
         else{
             this.model.setResultString("Bad");
         }
-
+        Finish();
     }
 
     /**
@@ -75,7 +74,24 @@ public class GPU {
      */
     public void tick(){
         timeClock++;
+        if(!ready) {
+            TrainModel();
+            SendDataBatch();
+        }
+        if(countPDB==processingDataBatch.size() && !ready){
+            Finish();
+        }
     }
+
+    public void TrainModelEvent(Model m){
+        ready=false;
+        model=m;
+        DivideDataBatch();
+        while(processingDataBatch.size() < capacity && indexUPDB<processingDataBatch.size())
+            SendDataBatch();
+    }
+
+
 
     /**
      * this function trains the process data the gpu holds
@@ -85,7 +101,7 @@ public class GPU {
      * @post processingDataBatch.size <= @pre(processingDataBatch.size)
      * @post countPDB >= @pre(countPDB)
      */
-    public void TrainModel(){
+    private void TrainModel(){
         while(!processingDataBatch.isEmpty() && processingDataBatch.peek().getSecond()+trainingTime<=timeClock) {
             processingDataBatch.poll();
             countPDB++;
@@ -106,7 +122,7 @@ public class GPU {
      * @post this.countPDB ==0
      * @post this.trainingTime =0;
      */
-    public void Finish(){
+    private void Finish(){
         cluster.finishTrainModel(model.getName());
         model=null;
         countPDB=0;
@@ -124,7 +140,7 @@ public class GPU {
      * @pre unProcessedDataBatch.isEmpty() == true;
      * @post unProcessedDataBatch.isEmpty() == false;
      */
-    public void DivideDataBatch(){
+    private void DivideDataBatch(){
         int size =model.getData().getSize()/1000;
         unProcessedDataBatch = new DataBatch[size];
         for(int i=0; i<size;i++){
@@ -141,7 +157,7 @@ public class GPU {
      * @pre unProcessedDataBatch.size()-1 > indexUPDB
      * @post this.indexUPDB = @pre(indexUPDB)+1
      */
-    public void SendDataBatch(){
+    private void SendDataBatch(){
         Pair tempPair = new  <DataBatch,Integer> Pair(unProcessedDataBatch[indexUPDB],id);
         cluster.ReceiveDataFromGpu(tempPair);
         indexUPDB++;
@@ -177,16 +193,16 @@ public class GPU {
     }
 
 
-    /**
-     * this function store the model the gpu needs to train
-     * <p>
-     * @param model the model the gpu needs to train
-     * @pre this.model == null
-     * @post this.model == model
-     */
-    public void setModel(Model model){
-        this.model = model;
-    }
+//    /**
+//     * this function store the model the gpu needs to train
+//     * <p>
+//     * @param model the model the gpu needs to train
+//     * @pre this.model == null
+//     * @post this.model == model
+//     */
+//    public void setModel(Model model){
+//        this.model = model;
+//    }
 
     public Type getType() {
         return type;
@@ -216,9 +232,9 @@ public class GPU {
         return ready;
     }
 
-    public void setReady(boolean ready) {
-        this.ready = ready;
-    }
+//    public void setReady(boolean ready) {
+//        this.ready = ready;
+//    }
 
     public Model getModel() {
         return model;
