@@ -17,6 +17,8 @@ public class Model {
     enum Result {None, Good, Bad}
     private Result result;
 
+    private boolean published;
+
     public Model(String name, Data data, double testProbability){
         this.name = name;
         this.data = data;
@@ -60,6 +62,14 @@ public class Model {
 
     public double getTestProbability() {
         return TestProbability;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
     }
 
     @Override

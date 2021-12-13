@@ -11,7 +11,7 @@ import java.util.PriorityQueue;
 
 /**
  * Conference service is in charge of
- * aggregating good results and publishing them via the {@link PublishConfrenceBroadcast},
+ * aggregating good results and publishing them via the {@link /PublishConfrenceBroadcast},
  * after publishing results the conference will unregister from the system.
  * This class may not hold references for objects which it is not responsible for.
  *
@@ -21,13 +21,11 @@ import java.util.PriorityQueue;
 public class ConferenceService extends MicroService {
 
     private ConfrenceInformation conf;
-    private PriorityQueue<Pair<String,Integer>> succesfulModels;
     int date;
 
     public ConferenceService(ConfrenceInformation conf) {
         super("Conference - " + conf.getName() + " Service");
         this.conf = conf;
-        this.succesfulModels = new PriorityQueue<>();
         date=0;
     }
 
@@ -39,13 +37,13 @@ public class ConferenceService extends MicroService {
     }
 
     public void PublishResults(String modelName, int id){
-        this.succesfulModels.add(new Pair(modelName, id));
+        this.conf.addSuccesfulModel(new Pair(modelName, id));
     }
 
     public void PublishConference(){
         date++;
         if(date==conf.getDate()) {
-            PublishConferenceBroadcast publish = new PublishConferenceBroadcast(this.succesfulModels);
+            PublishConferenceBroadcast publish = new PublishConferenceBroadcast(this.conf.getSuccesfulModels());
             sendBroadcast(publish);
             this.terminate();
         }

@@ -47,7 +47,7 @@ public class Student {
             TrainedModels.add(model);
             if(TestModel(model)){
                 if(PublishModel(model.getName())){
-                    publications++;
+                    model.setPublished(true);
                 }
             }
         }
