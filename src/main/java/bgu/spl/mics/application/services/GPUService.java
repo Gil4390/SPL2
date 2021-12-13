@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.*;
+import bgu.spl.mics.application.messages.TerminateBroadcast;
 import bgu.spl.mics.application.messages.TestModelEvent;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.messages.TrainModelEvent;
@@ -39,6 +40,7 @@ public class GPUService extends MicroService {
         subscribeEvent(TrainModelEvent.class, (TrainModelEvent)->{TrainModelEvent(TrainModelEvent);});
         subscribeEvent(TestModelEvent.class, (TestModelEvent)->{TestModel(TestModelEvent);});
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast)->{tick();});
+        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{terminate();});
     }
 
     private void tick(){

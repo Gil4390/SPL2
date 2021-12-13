@@ -3,10 +3,7 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.MessageBus;
 import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
-import bgu.spl.mics.application.messages.PublishConferenceBroadcast;
-import bgu.spl.mics.application.messages.PublishResultsEvent;
-import bgu.spl.mics.application.messages.TickBroadcast;
-import bgu.spl.mics.application.messages.TrainModelEvent;
+import bgu.spl.mics.application.messages.*;
 import bgu.spl.mics.application.objects.ConfrenceInformation;
 import bgu.spl.mics.application.objects.Pair;
 
@@ -38,6 +35,7 @@ public class ConferenceService extends MicroService {
     protected void initialize() {
         subscribeEvent(PublishResultsEvent.class, (PublishResultsEvent)->{PublishResults(PublishResultsEvent.getModelName(),PublishResultsEvent.getSenderId());});
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast)->{PublishConference();});
+        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{terminate();});
     }
 
     public void PublishResults(String modelName, int id){

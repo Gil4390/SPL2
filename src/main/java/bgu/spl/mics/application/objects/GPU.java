@@ -253,7 +253,7 @@ public class GPU {
         return id;
     }
 
-    public void setId(int id) { //Todo gil, need to set an id for every gpu
+    public void setId(int id) {
         this.id = id;
     }
 }

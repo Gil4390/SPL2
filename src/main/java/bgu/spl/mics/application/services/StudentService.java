@@ -30,7 +30,8 @@ public class StudentService extends MicroService {
 
     @Override
     protected void initialize() {
-        subscribeBroadcast(PublishConferenceBroadcast.class, (PublishConferenceBroadcast)->PublishConferenceBroadcast(PublishConferenceBroadcast));//todo need to implement this
+        subscribeBroadcast(PublishConferenceBroadcast.class, this::PublishConferenceBroadcast);
+        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{terminate();});
     }
 
     public Model TrainModel(Model model){

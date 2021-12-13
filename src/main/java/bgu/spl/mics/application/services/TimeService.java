@@ -3,6 +3,7 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.MessageBus;
 import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.messages.TerminateBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
 
 import java.util.Timer;
@@ -44,6 +45,7 @@ public class TimeService extends MicroService {
 			} catch (InterruptedException e) {
 			}
 		}
+		sendBroadcast(new TerminateBroadcast()); // todo need to make this broadcast first in the queue
 		terminate();
 	}
 }
