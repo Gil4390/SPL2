@@ -40,9 +40,10 @@ public class TimeService extends MicroService {
 			sendBroadcast(tickBroadcast);
 			TickCount++;
 			try {
-				Thread.sleep(speed);//todo replace with timer
-			} catch (InterruptedException e) {//todo terminate all}
+				Thread.sleep(speed);
+			} catch (InterruptedException e) {
 			}
 		}
+		terminate();
 	}
 }
