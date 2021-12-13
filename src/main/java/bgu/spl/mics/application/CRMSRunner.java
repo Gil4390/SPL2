@@ -1,10 +1,7 @@
 package bgu.spl.mics.application;
 
 import bgu.spl.mics.application.objects.*;
-import bgu.spl.mics.application.services.CPUService;
-import bgu.spl.mics.application.services.ConferenceService;
-import bgu.spl.mics.application.services.GPUService;
-import bgu.spl.mics.application.services.TimeService;
+import bgu.spl.mics.application.services.*;
 import com.google.gson.Gson;
 
 import java.io.Reader;
@@ -24,22 +21,17 @@ public class CRMSRunner {
     public static void main(String[] args) {
         System.out.println("Hello World!");
 
-        Vector<Student> STUDENTS = new Vector<>();
-        Vector<GPU> GPUS = new Vector<>();
-        Vector<CPU> CPUS = new Vector<>();
-        Vector<ConfrenceInformation> CONFERENCES = new Vector<>();
-        int TICK_TIME = 0;
-        int DURATION = 0;
-
         String students="";
         String gpus="";
         String cpus="";
         String conferences="";
         String TickTime = "";
         String Duration = "";
+        
+        String path = "C:\\Users\\gil43\\IdeaProjects\\SPL2\\example_input.json";
         try {
             Gson gson = new Gson();
-            Reader reader = Files.newBufferedReader(Paths.get("C:\\Users\\gil43\\IdeaProjects\\SPL2\\example_input.json"));
+            Reader reader = Files.newBufferedReader(Paths.get(path));
             Map<?, ?> map = gson.fromJson(reader, Map.class);
             for (Map.Entry<?, ?> entry : map.entrySet()) {
                 if (entry.getKey().equals("Students"))  students = entry.getValue().toString();
@@ -54,6 +46,27 @@ public class CRMSRunner {
             System.out.println(e.getMessage());
         }
 
+        Vector<Student> STUDENTS = JsonStringToStudentList(students);
+        Vector<GPU> GPUS = JsonStringToGPUList(gpus);
+        Vector<CPU> CPUS = JsonStringToCPUList(cpus);
+        Vector<ConfrenceInformation> CONFERENCES = JsonStringToConfList(conferences);
+        int TICK_TIME = Integer.parseInt(TickTime.substring(0, TickTime.length()-2));
+        int DURATION = Integer.parseInt(Duration.substring(0, Duration.length()-2));
+
+        Cluster cluster = Cluster.getInstance();
+        cluster.AddCPUS(CPUS);
+        cluster.AddGPUS(GPUS);
+
+        TimeService timeService = new TimeService(TICK_TIME, DURATION);
+
+        for (int i = 0; i < STUDENTS.size(); i++) {
+            STUDENTS.elementAt(i).act();
+        }
+    }
+
+
+    public static Vector<Student> JsonStringToStudentList(String students){
+        Vector<Student> Result = new Vector<>();
         int StudentID = 0;
         students = students.substring(1,students.length()-3);
         for (String str : students.split("]}, ")) {
@@ -65,7 +78,7 @@ public class CRMSRunner {
             Student student = new Student(name, department, status);
             student.setId(StudentID);
             StudentID++;
-            STUDENTS.add(student);
+            Result.add(student);
             String[] models = str_split1[1].substring(1, str_split1[1].length()-1).split("}, ");
             for(String m : models){
                 String[] m_split = m.split(", ");
@@ -88,52 +101,51 @@ public class CRMSRunner {
                 student.AddModel(model);
             }
         }
+        return Result;
+    }
 
+    public static Vector<GPU> JsonStringToGPUList(String gpus){
+        Vector<GPU> Result = new Vector<>();
         int GPU_ID = 0;
         gpus = gpus.substring(1,gpus.length()-1);
         for (String str : gpus.split(", ")) {
             GPU gpu = new GPU(str, Cluster.getInstance());
             gpu.setId(GPU_ID);
             GPU_ID++;
-            GPUS.add(gpu);
+            Result.add(gpu);
             GPUService gpuService = new GPUService(gpu);
             gpuService.run();
         }
+        return Result;
+    }
 
+    public static Vector<CPU> JsonStringToCPUList(String cpus){
+        Vector<CPU> Result = new Vector<>();
         int CPU_ID = 0;
         cpus = cpus.substring(1,cpus.length()-1);
         for (String str : cpus.split(", ")) {
             CPU cpu = new CPU(Integer.parseInt(str.substring(0,str.length()-2)));
             cpu.setId(CPU_ID);
             CPU_ID++;
-            CPUS.add(cpu);
+            Result.add(cpu);
             CPUService cpuService = new CPUService(cpu);
             cpuService.run();
         }
+        return Result;
+    }
 
+    public static Vector<ConfrenceInformation> JsonStringToConfList(String conferences){
+        Vector<ConfrenceInformation> Result = new Vector<>();
         conferences = conferences.substring(1,conferences.length()-2);
         for (String str : conferences.split("}, ")) {
             String cName = str.split(", ")[0].substring(6);
             String cDate = str.split(", ")[1].substring(5);
             int cDateInt = Integer.parseInt(cDate.substring(0, cDate.length()-2));
             ConfrenceInformation conference = new ConfrenceInformation(cName, cDateInt);
-            CONFERENCES.add(conference);
+            Result.add(conference);
             ConferenceService conferenceService = new ConferenceService(conference);
             conferenceService.run();
         }
-
-        TICK_TIME = Integer.parseInt(TickTime.substring(0, TickTime.length()-2));
-
-        DURATION = Integer.parseInt(Duration.substring(0, Duration.length()-2));
-
-        Cluster cluster = Cluster.getInstance();
-        cluster.AddCPUS(CPUS);
-        cluster.AddGPUS(GPUS);
-
-        TimeService timeService = new TimeService(TICK_TIME, DURATION);
-
-        for (int i = 0; i < STUDENTS.size(); i++) {
-            STUDENTS.elementAt(i).act();
-        }
+        return Result;
     }
 }
