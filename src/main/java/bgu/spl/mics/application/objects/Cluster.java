@@ -22,16 +22,11 @@ public class Cluster {
 
 	private Stack<String> modelNames;
 
-	private int numberOfDataBatchProcessedByCpu;
-
-	private int gpu_TimeUsed;
-	private int cpu_TimeUsed;
 	private int cpuRoundIndex;
 
+	private Statistics statistics;
 	private Cluster(){
-		numberOfDataBatchProcessedByCpu=0;
-		gpu_TimeUsed=0;
-		cpu_TimeUsed=0;
+		statistics= new Statistics();
 		cpuRoundIndex=0;
 	}
 	/**
@@ -48,7 +43,7 @@ public class Cluster {
 
 	public void ReceiveDataFromCpu(Pair<DataBatch,Integer> dataBatchPair, int cpuID){
 		GPU tempGPU= GPUs.get(dataBatchPair.getSecond());
-		numberOfDataBatchProcessedByCpu ++; // todo need to solve the problem of thread here
+		statistics.AddNumberOfDataBatchProcessedByCpu();
 		synchronized(tempGPU) {
 			tempGPU.ReceiveProcessedData(dataBatchPair.getFirst());
 			if (!CPUs.get(cpuID).getSecond().isEmpty())
@@ -69,19 +64,8 @@ public class Cluster {
 		}
 	}
 
-	//for gpu test.
 	public Collection<Object> getDataBATCH_ForCPU() {//todo implement this
 		return null;
-	}
-
-	public synchronized void calculateTimeUnitUsed(){
-		for (Pair<CPU, PriorityQueue<Pair<DataBatch,Integer>>> pair:CPUs.values()) {
-			cpu_TimeUsed += pair.getFirst().getProcessedTime();
-		}
-		Collection <GPU> collectionOfGPUs = GPUs.values();
-		for (GPU gpu:collectionOfGPUs) {
-			gpu_TimeUsed += gpu.getTimeClock();
-		}
 	}
 
 	public void finishTrainModel(String modelName){
@@ -100,17 +84,8 @@ public class Cluster {
 		}
 	}
 
-	public int getNumberOfDataBatchProcessedByCpu(){
-		return numberOfDataBatchProcessedByCpu;
-	}
-	public int getCpu_TimeUsed() {
-		return cpu_TimeUsed;
-	}
-
-	public int getGpu_TimeUsed() {
-		return gpu_TimeUsed;
-	}
 	public Stack<String> getModelNames() {
 		return modelNames;
 	}
+	public Statistics getStatistics() {return statistics;}
 }

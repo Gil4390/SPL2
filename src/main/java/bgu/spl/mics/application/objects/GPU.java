@@ -77,8 +77,10 @@ public class GPU {
         if(!ready) {
             TrainModel();
             SendDataBatch();
+            cluster.getStatistics().AddGpu_TimeUsed();
         }
         if(countPDB==processingDataBatch.size() && !ready){
+            cluster.finishTrainModel(model.getName());
             Finish();
         }
     }
@@ -123,7 +125,6 @@ public class GPU {
      * @post this.trainingTime =0;
      */
     private void Finish(){
-        cluster.finishTrainModel(model.getName());
         model=null;
         countPDB=0;
         indexUPDB=0;
