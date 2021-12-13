@@ -64,10 +64,11 @@ public class Cluster {
 		}
 	}
 
+	/*
 	public Collection<Object> getDataBATCH_ForCPU() {//todo implement this
 		return null;
 	}
-
+	 */
 	public void finishTrainModel(String modelName){
 		modelNames.add(modelName);
 	}
