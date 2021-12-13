@@ -24,7 +24,7 @@ public class MessageBusImpl implements MessageBus {
 
 	private ConferenceService conference;
 
-	private MessageBusImpl() {//todo create all event and broadcast in eventsBroadcast_subscribe
+	private MessageBusImpl() {
 		//todo make this function a thread save
 	}
 
@@ -70,7 +70,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @post none
 	 */
 	@Override
-	public void sendBroadcast(Broadcast b) {//todo notify the microservice that waits
+	public void sendBroadcast(Broadcast b) {
 		LinkedList<MicroService> list = Broadcast_subscribe.get(b);
 		for (MicroService m:list) {
 			microService_queues.get(m.getName()).add(b);
@@ -83,7 +83,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @post none
 	 */
 	@Override
-	public <T> Future<T> sendEvent(Event<T> e) {//todo notify the microservice that waits
+	public <T> Future<T> sendEvent(Event<T> e) {
 		Queue<MicroService> queue = event_subscribe.get(e);
 		MicroService m = queue.poll();
 		microService_queues.get(m.getName()).add(e);

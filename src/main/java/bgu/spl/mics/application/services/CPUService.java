@@ -3,6 +3,7 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.MessageBus;
 import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.messages.TerminateBroadcast;
 import bgu.spl.mics.application.messages.TestModelEvent;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.objects.CPU;
@@ -28,5 +29,6 @@ public class CPUService extends MicroService {
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick)-> {
             cpu.tickAndCompute();
         });
+        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{terminate();});
     }
 }

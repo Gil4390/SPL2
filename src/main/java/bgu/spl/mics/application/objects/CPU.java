@@ -53,6 +53,8 @@ public class CPU {
      */
     public void tickAndCompute(){
         processedTime++;
+        if(!ready)
+            cluster.getStatistics().AddCpu_TimeUsed();
         if(!ready & processedTime==endProcessedTime){
             cluster.ReceiveDataFromCpu(databatchPair, this.id);
             endProcessedTime=0;
