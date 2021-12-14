@@ -48,6 +48,10 @@ public class Data {
         return type;
     }
 
+    public String getTypeString(){
+        return type.toString();
+    }
+
     public int getProcessed() {
         return processed;
     }

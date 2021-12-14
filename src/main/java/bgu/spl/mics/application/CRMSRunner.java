@@ -1,6 +1,7 @@
 package bgu.spl.mics.application;
 
 import bgu.spl.mics.application.objects.*;
+import bgu.spl.mics.application.objects.OutputObjects.*;
 import bgu.spl.mics.application.services.*;
 import com.google.gson.Gson;
 
@@ -62,6 +63,12 @@ public class CRMSRunner {
         for (int i = 0; i < STUDENTS.size(); i++) {
             STUDENTS.elementAt(i).act();
         }
+
+
+
+        OutputJSON outputJSON = CreateOutputObject(STUDENTS, CONFERENCES, cluster);
+        String jsonString = ConvertObjectToJSONString(outputJSON);
+        System.out.println(jsonString);
     }
 
 
@@ -147,5 +154,59 @@ public class CRMSRunner {
             conferenceService.run();
         }
         return Result;
+    }
+
+    public static OutputJSON CreateOutputObject(Vector<Student> students, Vector<ConfrenceInformation> conferences, Cluster cluster){
+        OutStudent[] outStudents = new OutStudent[students.size()];
+        for(int i = 0; i < students.size(); i++){
+            Student s = students.elementAt(i);
+            OutModel[] models = new OutModel[s.getTrainedModels().size()];
+            for(int j = 0; j < s.getTrainedModels().size(); j++){
+                Model m = s.getTrainedModels().poll();
+                Data data = m.getData();
+                OutData outdata = new OutData(data.getTypeString(), data.getSize());
+                models[j] = new OutModel(m.getName(), outdata, m.getStatusString(), m.getResultString());
+            }
+            outStudents[i] = new OutStudent(s.getName(), s.getDepartment(), s.getStatus().toString(), s.getPublications(), s.getPapersRead(), models);
+        }
+
+        OutConference[] outConferences = new OutConference[conferences.size()];
+        for(int i = 0; i < conferences.size(); i++){
+            ConfrenceInformation c = conferences.elementAt(i);
+            OutModel[] models = new OutModel[c.getSuccesfulModels().size()];
+            for(int j = 0; j < c.getSuccesfulModels().size(); j++){
+                Pair<String, Integer> p = c.getSuccesfulModels().poll();
+                for (Student student : students){
+                    if(p.getSecond() == student.getId()){
+                        for (Model s_model : student.getTrainedModels()){
+                            if(s_model.isPublished() && s_model.getName()==p.getFirst()){
+                                s_model = s_model;
+                                Data data = s_model.getData();
+                                OutData outdata = new OutData(data.getTypeString(), data.getSize());
+                                models[j] = new OutModel(s_model.getName(), outdata, s_model.getStatusString(), s_model.getResultString());
+                            }
+                        }
+                    }
+                }
+            }
+            outConferences[i] = new OutConference(c.getName(), c.getDate(), models);
+        }
+
+        int cpuTimes = cluster.getStatistics().getCpu_TimeUsed();
+        int gpuTimes = cluster.getStatistics().getGpu_TimeUsed();
+        int batchTimes = cluster.getStatistics().getNumberOfDataBatchProcessedByCpu();
+
+        OutputJSON out = new OutputJSON(outStudents, outConferences,cpuTimes, gpuTimes, batchTimes);
+        return out;
+    }
+
+    public static String ConvertObjectToJSONString(OutputJSON out){
+        String json = "";
+        try {
+            json = new Gson().toJson(out);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return json;
     }
 }
