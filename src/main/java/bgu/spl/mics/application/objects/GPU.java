@@ -78,7 +78,7 @@ public class GPU {
             SendDataBatch();
             cluster.getStatistics().AddGpu_TimeUsed();
         }
-        if(countPDB==processingDataBatch.size() && !ready){
+        if(countPDB==processingDataBatch.size() && countPDB!=0 && !ready){
             cluster.finishTrainModel(model.getName());
             Finish();
         }
@@ -254,4 +254,5 @@ public class GPU {
     public int getId() {
         return id;
     }
+
 }

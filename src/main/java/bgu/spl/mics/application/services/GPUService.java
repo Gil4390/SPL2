@@ -69,8 +69,7 @@ public class GPUService extends MicroService {
         }
         else {
             gpu.TestModel(event.getModel());
-            //TODO need to notify that model result changed
-
+            complete(event,false);
             nextEvent();
         }
     }
