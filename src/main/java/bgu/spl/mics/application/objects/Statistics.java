@@ -56,16 +56,4 @@ public class Statistics {
         return numberOfDataBatchProcessedByCpu;
     }
 
-
-    public int getGpu_TimeUsed() {
-        return gpu_TimeUsed;
-    }
-
-    public int getCpu_TimeUsed() {
-        return cpu_TimeUsed;
-    }
-
-    public int getNumberOfDataBatchProcessedByCpu() {
-        return numberOfDataBatchProcessedByCpu;
-    }
 }

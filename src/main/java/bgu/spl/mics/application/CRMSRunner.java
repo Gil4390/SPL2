@@ -192,9 +192,9 @@ public class CRMSRunner {
             outConferences[i] = new OutConference(c.getName(), c.getDate(), models);
         }
 
-        int cpuTimes = cluster.getStatistics().getCpu_TimeUsed();
-        int gpuTimes = cluster.getStatistics().getGpu_TimeUsed();
-        int batchTimes = cluster.getStatistics().getNumberOfDataBatchProcessedByCpu();
+        int cpuTimes = cluster.getStatistics().getCpu_TimeUsed().get();
+        int gpuTimes = cluster.getStatistics().getGpu_TimeUsed().get();
+        int batchTimes = cluster.getStatistics().getNumberOfDataBatchProcessedByCpu().get();
 
         OutputJSON out = new OutputJSON(outStudents, outConferences,cpuTimes, gpuTimes, batchTimes);
         return out;
