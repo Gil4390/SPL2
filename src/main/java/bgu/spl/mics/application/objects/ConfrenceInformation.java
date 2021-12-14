@@ -1,6 +1,8 @@
 package bgu.spl.mics.application.objects;
 
+import java.util.LinkedList;
 import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * Passive object representing information on a conference.
@@ -10,10 +12,10 @@ public class ConfrenceInformation {
 
     private String name;
     private int date;
-    private PriorityQueue<Pair<String,Integer>> succesfulModels;
+    private Queue<Pair<String,Integer>> succesfulModels;
 
     public ConfrenceInformation(String name, int date) {
-        this.succesfulModels = new PriorityQueue<>();
+        this.succesfulModels = new LinkedList<>();
         this.name = name;
         this.date = date;
     }
@@ -35,7 +37,7 @@ public class ConfrenceInformation {
                 '}';
     }
 
-    public PriorityQueue<Pair<String, Integer>> getSuccesfulModels() {
+    public Queue<Pair<String, Integer>> getSuccesfulModels() {
         return succesfulModels;
     }
 

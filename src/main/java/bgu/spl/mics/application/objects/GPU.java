@@ -42,7 +42,7 @@ public class GPU {
             case "RTX2080": {capacity = 16; trainingTime=2;}
             case "RTX3090": {capacity = 32; trainingTime=1;}
         }
-        processingDataBatch= new PriorityQueue<Pair<DataBatch,Integer>>();
+        processingDataBatch= new LinkedList<Pair<DataBatch,Integer>>();
         this.cluster = cluster;
         countPDB=0;
         model = null;

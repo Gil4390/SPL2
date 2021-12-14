@@ -11,7 +11,7 @@ public class PublishConferenceBroadcast implements Broadcast {
 
     private Pair<String,Integer>[] models;
 
-    public PublishConferenceBroadcast(PriorityQueue<Pair<String,Integer>> models) {
+    public PublishConferenceBroadcast(Queue<Pair<String,Integer>> models) {
         this.models = new Pair[models.size()];
         for (int i=0; i< models.size(); i++){
             this.models[i] = models.poll();

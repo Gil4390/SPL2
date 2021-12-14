@@ -9,6 +9,7 @@ import bgu.spl.mics.application.objects.GPU;
 import bgu.spl.mics.application.objects.Model;
 import bgu.spl.mics.application.objects.Pair;
 
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -30,8 +31,8 @@ public class GPUService extends MicroService {
     public GPUService(GPU gpu) {
         super("GPU - " + (gpu.getId()) + " Service");
         this.gpu = gpu;
-        TrainModelEventQueue = new PriorityQueue<>();
-        TestModelEventQueue = new PriorityQueue<>();
+        TrainModelEventQueue = new LinkedList<>();
+        TestModelEventQueue = new LinkedList<>();
         clock=0;
     }
 

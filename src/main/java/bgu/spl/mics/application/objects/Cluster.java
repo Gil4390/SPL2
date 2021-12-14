@@ -16,10 +16,10 @@ import java.util.concurrent.locks.ReadWriteLock;
 public class Cluster {
 
 
-	private HashMap<Integer,Pair<CPU, PriorityQueue<Pair<DataBatch,Integer>>>> CPUs;
+	private HashMap<Integer,Pair<CPU, Queue<Pair<DataBatch,Integer>>>> CPUs;
 	private HashMap<Integer,GPU> GPUs;
 
-	private PriorityQueue<Pair<DataBatch,Integer>> dataBATCH_ForGPU;
+	private Queue<Pair<DataBatch,Integer>> dataBATCH_ForGPU;
 
 	private AtomicInteger cpuRoundIndex;
 
@@ -50,7 +50,7 @@ public class Cluster {
 		}
 	}
 	public void ReceiveDataFromGpu(Pair<DataBatch,Integer> dataBatchPair){//todo need to do a better thread save function
-		Pair<CPU, PriorityQueue<Pair<DataBatch,Integer>>> temp =CPUs.get(cpuRoundIndex);
+		Pair<CPU, Queue<Pair<DataBatch,Integer>>> temp =CPUs.get(cpuRoundIndex);
 		synchronized(temp) {
 			temp.getSecond().add(dataBatchPair);
 			if (!CPUs.get(cpuRoundIndex).getSecond().isEmpty() & CPUs.get(cpuRoundIndex).getFirst().isReady())
@@ -79,7 +79,7 @@ public class Cluster {
 
 	public void AddCPUS(Vector<CPU> cpus){
 		for (CPU cpu:cpus) {
-			Pair pair = new Pair(cpu, new PriorityQueue<Pair<DataBatch,Integer>>());
+			Pair pair = new Pair(cpu, new LinkedList<Pair<DataBatch,Integer>>());
 			CPUs.put(cpu.getId(),pair);
 		}
 	}

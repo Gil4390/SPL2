@@ -141,7 +141,7 @@ public class MessageBusImpl implements MessageBus {
 		if(!isRegistered(m))
 			throw new IllegalArgumentException();
 		if(microService_queues.get(m.getName()).isEmpty())
-			wait();
+			wait();//todo we need to check how to do this
 
 		return microService_queues.get(m.getName()).poll();
 	}
