@@ -1,5 +1,6 @@
 package bgu.spl.mics.application;
 
+import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.application.objects.*;
 import bgu.spl.mics.application.objects.OutputObjects.*;
 import bgu.spl.mics.application.services.*;
@@ -28,6 +29,8 @@ public class CRMSRunner {
         String conferences="";
         String TickTime = "";
         String Duration = "";
+
+        MessageBusImpl messageBus = MessageBusImpl.getInstance();
         
         String path = "C:\\Users\\gil43\\IdeaProjects\\SPL2\\example_input.json";
         try {
