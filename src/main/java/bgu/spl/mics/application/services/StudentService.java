@@ -40,6 +40,7 @@ public class StudentService extends MicroService {
             Model model = TrainModel(m);
             this.student.getTrainedModels().add(model);
             if (TestModel(model)) {
+                System.out.println("student: "+ student.getId()+", model was tested and return the result: "+ model.getResultString());
                 if (PublishResults(model.getName())) {
                     model.setPublished(true);
                 }

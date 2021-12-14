@@ -51,7 +51,7 @@ public class GPUService extends MicroService {
         gpu.tick();
         if(gpu.isReady()) {
             if(gpu.isFinishTrainModel())
-                complete(currentEvent,currentEvent.getFuture());
+                complete(currentEvent,gpu.getModel());
             nextEvent();
         }
     }
@@ -74,9 +74,13 @@ public class GPUService extends MicroService {
         }
         else {
             currentEvent=event;
-            System.out.println("TestModelEvent, from GPU:"+ gpu.getId());
+            System.out.println("--------------------------------------------------TestModelEvent, from GPU:"+ gpu.getId());
             gpu.TestModel(event.getModel());
-            complete(event,false);
+            if(event.getModel().getResultString() == "Good")
+                complete(event,true);
+            else{
+                complete(event,false);
+            }
             nextEvent();
         }
     }

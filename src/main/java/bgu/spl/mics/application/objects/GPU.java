@@ -4,6 +4,8 @@ import bgu.spl.mics.application.services.GPUService;
 
 import java.util.*;
 
+import static bgu.spl.mics.application.objects.Model.Status.Trained;
+
 /**
  * Passive object representing a single GPU.
  * Add all the fields described in the assignment as private fields.
@@ -66,6 +68,7 @@ public class GPU {
         else{
             this.model.setResultString("Bad");
         }
+        model.setStatusString("Tested");
         Finish();
     }
 
@@ -84,6 +87,7 @@ public class GPU {
             if (unProcessedDataBatch!=null && countPDB == unProcessedDataBatch.length & countPDB != 0) {
                 cluster.finishTrainModel(model.getName());
                 finishTrainModel = true;
+                model.setStatusString("Trained");
                 Finish();
             }
         }
@@ -93,6 +97,7 @@ public class GPU {
         ready=false;
         finishTrainModel=false;
         model=m;
+        model.setStatusString("Training");
         DivideDataBatch();
     }
 

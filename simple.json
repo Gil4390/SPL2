@@ -42,5 +42,5 @@
     {"name": "ICML", "date": 2000}
   ],
   "TickTime": 50,
-  "Duration": 40
+  "Duration": 100
 }
