@@ -32,6 +32,19 @@ public class StudentService extends MicroService {
     protected void initialize() {
         subscribeBroadcast(PublishConferenceBroadcast.class, this::PublishConferenceBroadcast);
         subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{terminate();});
+        act();
+    }
+
+    public void act() {
+        for (Model m : this.student.getModels()) {
+            Model model = TrainModel(m);
+            this.student.getTrainedModels().add(model);
+            if (TestModel(model)) {
+                if (PublishResults(model.getName())) {
+                    model.setPublished(true);
+                }
+            }
+        }
     }
 
     public Model TrainModel(Model model){
