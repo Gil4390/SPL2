@@ -22,8 +22,6 @@ public class MessageBusImpl implements MessageBus {
 
 	private TimeService timeService;
 
-	private ConferenceService conference;
-
 	private MessageBusImpl() {
 		//todo make this function a thread save
 	}
@@ -41,9 +39,8 @@ public class MessageBusImpl implements MessageBus {
 	 * @post this.isSubscribed(m,type) == true;
 	 */
 	@Override
-	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
+	public synchronized <T> void  subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
 		event_subscribe.get(type).add(m);
-
 	}
 
 	/**
@@ -51,7 +48,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @post this.isSubscribed(m,type) == true;
 	 */
 	@Override
-	public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
+	public synchronized void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
 		Broadcast_subscribe.get(type).add(m);
 	}
 
@@ -61,7 +58,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @post result = e.future.get();
 	 */
 	@Override
-	public <T> void complete(Event<T> e, T result) {
+	public synchronized <T> void complete(Event<T> e, T result) {
 		e.getFuture().resolve(result);
 	}
 
@@ -70,7 +67,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @post none
 	 */
 	@Override
-	public void sendBroadcast(Broadcast b) {
+	public synchronized void sendBroadcast(Broadcast b) {
 		LinkedList<MicroService> list = Broadcast_subscribe.get(b);
 		for (MicroService m:list) {
 			microService_queues.get(m.getName()).add(b);
@@ -83,7 +80,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @post none
 	 */
 	@Override
-	public <T> Future<T> sendEvent(Event<T> e) {
+	public synchronized <T> Future<T> sendEvent(Event<T> e) {
 		Queue<MicroService> queue = event_subscribe.get(e);
 		MicroService m = queue.poll();
 		microService_queues.get(m.getName()).add(e);
@@ -97,7 +94,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @post this.isRegistered(m) == true;
 	 */
 	@Override
-	public void register(MicroService m) {
+	public synchronized void register(MicroService m) {
 		microService_queues.put(m.getName(),new PriorityQueue<Message>());
 	}
 
@@ -105,7 +102,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @post this.isRegistered(m) == false;
 	 */
 	@Override
-	public void unregister(MicroService m) {
+	public synchronized void unregister(MicroService m) {
 		for (Queue<MicroService> queue:event_subscribe.values()) {
 			for(int i=0; i<queue.size();i++){
 				MicroService temp = queue.poll();
@@ -127,7 +124,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @post microService_queues[m].size() = @pre microService_queues[m].size()-1
 	 */
 	@Override
-	public Message awaitMessage(MicroService m) throws InterruptedException {
+	public synchronized Message awaitMessage(MicroService m) throws InterruptedException {
 		if(!isRegistered(m))
 			throw new IllegalArgumentException();
 		if(microService_queues.get(m.getName()).isEmpty())
@@ -143,7 +140,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @param s the MicroService
 	 * @param m the Message
 	 */
-	public boolean isSubscribed(MicroService s, Message m){
+	public synchronized boolean isSubscribed(MicroService s, Message m){
 		return Broadcast_subscribe.get(m).contains((s.getName()));
 	}
 
@@ -153,29 +150,19 @@ public class MessageBusImpl implements MessageBus {
 	 * @return true if already registered or false
 	 * @param s the MicroService
 	 */
-	public boolean isRegistered(MicroService s){
+	public synchronized boolean isRegistered(MicroService s){
 		return microService_queues.containsKey((s.getName()));
 	}
 
-	/**
-	 * the function return the next MicroService that will handle the event
-	 * <p>
-	 * @return the next MicroService that will handle the event
-	 * @param m the MicroService
-	 */
-	private MicroService getNextMicroService(Message m){
-		return null;
-	}
+//	public HashMap<Class<? extends Message>, Queue<MicroService>> getEvent_subscribe() {
+//		return event_subscribe;
+//	}
+//
+//	public HashMap<Class<? extends Message>, LinkedList<MicroService>> getBroadcast_subscribe() {
+//		return Broadcast_subscribe;
+//	}
 
-	public HashMap<Class<? extends Message>, Queue<MicroService>> getEvent_subscribe() {
-		return event_subscribe;
-	}
-
-	public HashMap<Class<? extends Message>, LinkedList<MicroService>> getBroadcast_subscribe() {
-		return Broadcast_subscribe;
-	}
-
-	public HashMap<String, Queue<Message>> getMicroService_queues() {
+	public synchronized HashMap<String, Queue<Message>> getMicroService_queues() {
 		return microService_queues;
 	}
 }

@@ -3,6 +3,7 @@ package bgu.spl.mics.application.objects;
 
 import java.util.Collection;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 
 /**
@@ -20,14 +21,12 @@ public class Cluster {
 
 	private PriorityQueue<Pair<DataBatch,Integer>> dataBATCH_ForGPU;
 
-	private Stack<String> modelNames;
-
-	private int cpuRoundIndex;
+	private AtomicInteger cpuRoundIndex;
 
 	private Statistics statistics;
 	private Cluster(){
 		statistics= new Statistics();
-		cpuRoundIndex=0;
+		cpuRoundIndex=new AtomicInteger(0);
 	}
 	/**
      * Retrieves the single instance of this class.
@@ -56,21 +55,26 @@ public class Cluster {
 			temp.getSecond().add(dataBatchPair);
 			if (!CPUs.get(cpuRoundIndex).getSecond().isEmpty() & CPUs.get(cpuRoundIndex).getFirst().isReady())
 				CPUs.get(cpuRoundIndex).getFirst().ReceiveUnProcessedData(CPUs.get(cpuRoundIndex).getSecond().remove());
-			if (CPUs.size() == cpuRoundIndex)
-				cpuRoundIndex = 0;
+			if (CPUs.size() == cpuRoundIndex.get()) {
+				if(cpuRoundIndex.compareAndSet(CPUs.size(),0)){}
+				else{
+					int val;
+					do{
+						val=cpuRoundIndex.get();
+					}while(!cpuRoundIndex.compareAndSet(val,val+1));
+				}
+			}
 			else {
-				cpuRoundIndex++;// todo need to solve the problem of thread here
+				int val;
+				do{
+					val=cpuRoundIndex.get();
+				}while(!cpuRoundIndex.compareAndSet(val,val+1));
 			}
 		}
 	}
 
-	/*
-	public Collection<Object> getDataBATCH_ForCPU() {//todo implement this
-		return null;
-	}
-	 */
 	public void finishTrainModel(String modelName){
-		modelNames.add(modelName);
+			statistics.AddModelName(modelName);
 	}
 
 	public void AddCPUS(Vector<CPU> cpus){
@@ -85,8 +89,9 @@ public class Cluster {
 		}
 	}
 
-	public Stack<String> getModelNames() {
-		return modelNames;
+	public Statistics getStatistics() {
+		synchronized (statistics) {
+			return statistics;
+		}
 	}
-	public Statistics getStatistics() {return statistics;}
 }
