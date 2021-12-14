@@ -10,7 +10,7 @@ class CPUTest {
     CPU cpu;
     @BeforeEach
     void setUp() {
-        cpu = new CPU(8);
+        cpu = new CPU(8, 0);
     }
 
     @Test

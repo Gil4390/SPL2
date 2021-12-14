@@ -29,8 +29,8 @@ public class CRMSRunner {
         String Duration = "";
 
         MessageBusImpl messageBus = MessageBusImpl.getInstance();
-        
-        String path = "C:\\Users\\gil43\\IdeaProjects\\SPL2\\example_input.json";
+        //todo valid input
+        String path = "C:\\Users\\gil43\\IdeaProjects\\SPL2\\simple.json";
         try {
             Gson gson = new Gson();
             Reader reader = Files.newBufferedReader(Paths.get(path));
@@ -59,6 +59,12 @@ public class CRMSRunner {
         cluster.AddCPUS(CPUS);
         cluster.AddGPUS(GPUS);
 
+        try {
+            Thread.sleep(100);
+        }
+        catch (Exception e){
+
+        }
         TimeService timeService = new TimeService(TICK_TIME, DURATION);
         timeService.run();
         for (int i = 0; i < STUDENTS.size(); i++) {
@@ -83,8 +89,7 @@ public class CRMSRunner {
             String name = str_split[0].substring(6);
             String department = str_split[1].substring(11);
             String status = str_split[2].substring(7);
-            Student student = new Student(name, department, status);
-            student.setId(StudentID);
+            Student student = new Student(name, department, status, StudentID);
             StudentID++;
             Result.add(student);
             String[] models = str_split1[1].substring(1, str_split1[1].length()-1).split("}, ");
@@ -117,12 +122,12 @@ public class CRMSRunner {
         int GPU_ID = 0;
         gpus = gpus.substring(1,gpus.length()-1);
         for (String str : gpus.split(", ")) {
-            GPU gpu = new GPU(str, Cluster.getInstance());
-            gpu.setId(GPU_ID);
+            GPU gpu = new GPU(str, Cluster.getInstance(), GPU_ID);
             GPU_ID++;
             Result.add(gpu);
             GPUService gpuService = new GPUService(gpu);
-            gpuService.run();
+            Thread gpuThread = new Thread(gpuService);
+            gpuThread.start();
         }
         return Result;
     }
@@ -132,12 +137,12 @@ public class CRMSRunner {
         int CPU_ID = 0;
         cpus = cpus.substring(1,cpus.length()-1);
         for (String str : cpus.split(", ")) {
-            CPU cpu = new CPU(Integer.parseInt(str.substring(0,str.length()-2)));
-            cpu.setId(CPU_ID);
+            CPU cpu = new CPU(Integer.parseInt(str.substring(0,str.length()-2)), CPU_ID);
             CPU_ID++;
             Result.add(cpu);
             CPUService cpuService = new CPUService(cpu);
-            cpuService.run();
+            Thread cpuThread = new Thread(cpuService);
+            cpuThread.start();
         }
         return Result;
     }
@@ -152,10 +157,13 @@ public class CRMSRunner {
             ConfrenceInformation conference = new ConfrenceInformation(cName, cDateInt);
             Result.add(conference);
             ConferenceService conferenceService = new ConferenceService(conference);
-            conferenceService.run();
+            Thread confThread = new Thread(conferenceService);
+            confThread.start();
         }
         return Result;
     }
+
+
 
     public static OutputJSON CreateOutputObject(Vector<Student> students, Vector<ConfrenceInformation> conferences, Cluster cluster){
         OutStudent[] outStudents = new OutStudent[students.size()];

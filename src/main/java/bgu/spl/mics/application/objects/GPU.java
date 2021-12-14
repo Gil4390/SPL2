@@ -18,8 +18,7 @@ public class GPU {
 
     private Type type;
 
-    int id;
-
+    private final int id;
     private Model model;
     private Cluster cluster;
 
@@ -35,8 +34,9 @@ public class GPU {
 
     private boolean ready;
 
-    public GPU(String type,Cluster cluster){
+    public GPU(String type,Cluster cluster, int id){
         this.type=FromStringToType(type);
+        this.id = id;
         switch(type){
             case "GTX1080": {capacity = 8; trainingTime=4;}
             case "RTX2080": {capacity = 16; trainingTime=2;}
@@ -250,9 +250,5 @@ public class GPU {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 }

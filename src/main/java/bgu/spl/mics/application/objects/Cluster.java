@@ -27,6 +27,10 @@ public class Cluster {
 	private Cluster(){
 		statistics= new Statistics();
 		cpuRoundIndex=new AtomicInteger(0);
+
+		CPUs = new HashMap<>();
+		GPUs = new HashMap<>();
+		dataBATCH_ForGPU = new LinkedList<>();
 	}
 	/**
      * Retrieves the single instance of this class.
@@ -41,6 +45,7 @@ public class Cluster {
 	}
 
 	public void ReceiveDataFromCpu(Pair<DataBatch,Integer> dataBatchPair, int cpuID){
+		System.out.println("received from CPU, id:" + cpuID);
 		GPU tempGPU= GPUs.get(dataBatchPair.getSecond());
 		statistics.AddNumberOfDataBatchProcessedByCpu();
 		synchronized(tempGPU) {
@@ -50,6 +55,7 @@ public class Cluster {
 		}
 	}
 	public void ReceiveDataFromGpu(Pair<DataBatch,Integer> dataBatchPair){//todo need to do a better thread save function
+		System.out.println("received from GPU, id:" + dataBatchPair.getSecond());
 		Pair<CPU, Queue<Pair<DataBatch,Integer>>> temp =CPUs.get(cpuRoundIndex);
 		synchronized(temp) {
 			temp.getSecond().add(dataBatchPair);

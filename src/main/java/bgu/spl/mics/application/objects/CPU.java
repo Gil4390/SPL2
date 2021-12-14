@@ -6,7 +6,7 @@ package bgu.spl.mics.application.objects;
  * Add fields and methods to this class as you see fit (including public methods and constructors).
  */
 public class CPU {
-    private int id;
+    private final int id;
     private final int cores;
     private Pair<DataBatch,Integer> databatchPair;
     private final Cluster cluster;
@@ -14,9 +14,10 @@ public class CPU {
     private int processedTime;
     private int endProcessedTime;
 
-    public CPU(int numOfCores){
+    public CPU(int numOfCores, int id){
         cores=numOfCores;
         this.cluster=Cluster.getInstance();
+        this.id = id;
         ready=true;
         processedTime=0;
     }
@@ -87,8 +88,4 @@ public class CPU {
     public int getId() {
         return id;
     }
-    public void setId(int id){
-        this.id = id;
-    }
-
 }

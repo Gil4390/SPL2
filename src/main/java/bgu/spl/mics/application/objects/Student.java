@@ -19,7 +19,7 @@ public class Student {
         MSc, PhD
     }
 
-    private int id;
+    private final int id;
     private String name;
     private String department;
     private Degree status;
@@ -30,7 +30,7 @@ public class Student {
     private Queue<Model> models;
     private Queue<Model> TrainedModels;
 
-    public Student(String name, String department, String degree){
+    public Student(String name, String department, String degree, int id){
         this.name = name;
         this.department = department;
         this.status = FromStringToType(degree);
@@ -38,11 +38,12 @@ public class Student {
         papersRead = 0;
         this.models = new LinkedList<>();
         this.TrainedModels = new LinkedList<>();
+        this.id = id;
 
         studentService = new StudentService(this);
 
-        Thread t = new Thread(studentService);
-        t.start();
+        Thread studentThread = new Thread(studentService);
+        studentThread.start();
     }
 
     public void act(){
@@ -118,10 +119,6 @@ public class Student {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public Queue<Model> getModels() {

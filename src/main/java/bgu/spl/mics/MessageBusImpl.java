@@ -81,11 +81,11 @@ public class MessageBusImpl implements MessageBus {
 	 */
 	@Override
 	public synchronized void sendBroadcast(Broadcast b) {
-		LinkedList<MicroService> list = Broadcast_subscribe.get(b);
+		LinkedList<MicroService> list = Broadcast_subscribe.get(b.getClass());
 		for (MicroService m:list) {
 			microService_queues.get(m.getName()).add(b);
-			notifyAll();
 		}
+		notifyAll();
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class MessageBusImpl implements MessageBus {
 	 */
 	@Override
 	public synchronized <T> Future<T> sendEvent(Event<T> e) {
-		Queue<MicroService> queue = event_subscribe.get(e);
+		Queue<MicroService> queue = event_subscribe.get(e.getClass());
 		MicroService m = queue.poll();
 		microService_queues.get(m.getName()).add(e);
 		microService_queues.notifyAll();
@@ -108,7 +108,7 @@ public class MessageBusImpl implements MessageBus {
 	 */
 	@Override
 	public synchronized void register(MicroService m) {
-		microService_queues.put(m.getName(),new PriorityQueue<Message>());
+		microService_queues.put(m.getName(),new LinkedList<>());
 	}
 
 	/**
