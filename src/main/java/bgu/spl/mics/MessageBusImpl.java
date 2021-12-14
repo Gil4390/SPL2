@@ -140,8 +140,8 @@ public class MessageBusImpl implements MessageBus {
 	public synchronized Message awaitMessage(MicroService m) throws InterruptedException {
 		if(!isRegistered(m))
 			throw new IllegalArgumentException();
-		if(microService_queues.get(m.getName()).isEmpty())
-			wait();//todo we need to check how to do this
+		while(microService_queues.get(m.getName()).isEmpty())
+			wait();
 
 		return microService_queues.get(m.getName()).poll();
 	}
