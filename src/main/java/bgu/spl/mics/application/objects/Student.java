@@ -3,7 +3,9 @@ package bgu.spl.mics.application.objects;
 import bgu.spl.mics.Future;
 import bgu.spl.mics.application.services.StudentService;
 
+import java.util.LinkedList;
 import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * Passive object representing single student.
@@ -25,8 +27,8 @@ public class Student {
     private int papersRead;
     private StudentService studentService;
 
-    private PriorityQueue<Model> models;
-    private PriorityQueue<Model> TrainedModels;
+    private Queue<Model> models;
+    private Queue<Model> TrainedModels;
 
     public Student(String name, String department, String degree){
         this.name = name;
@@ -34,11 +36,13 @@ public class Student {
         this.status = FromStringToType(degree);
         publications = 0;
         papersRead = 0;
-        this.studentService = new StudentService(this);
-        this.models = new PriorityQueue<>();
-        this.TrainedModels = new PriorityQueue<>();
+        this.models = new LinkedList<>();
+        this.TrainedModels = new LinkedList<>();
 
-        studentService.run();
+        studentService = new StudentService(this);
+
+        Thread t = new Thread(studentService);
+        t.start();
     }
 
     public void act(){
@@ -120,11 +124,11 @@ public class Student {
         this.id = id;
     }
 
-    public PriorityQueue<Model> getModels() {
+    public Queue<Model> getModels() {
         return models;
     }
 
-    public PriorityQueue<Model> getTrainedModels() {
+    public Queue<Model> getTrainedModels() {
         return TrainedModels;
     }
 

@@ -1,5 +1,6 @@
 package bgu.spl.mics;
 
+import bgu.spl.mics.application.messages.*;
 import bgu.spl.mics.application.objects.Cluster;
 import bgu.spl.mics.application.services.ConferenceService;
 import bgu.spl.mics.application.services.StudentService;
@@ -20,12 +21,22 @@ public class MessageBusImpl implements MessageBus {
 
 	private HashMap<String, Queue<Message>> microService_queues; // string = microservice name
 
-	private TimeService timeService;
-
 	private MessageBusImpl() {
 		event_subscribe = new HashMap<>();
 		Broadcast_subscribe= new HashMap<>();
 		microService_queues = new HashMap<>();
+		Initialize();
+	}
+
+	private void Initialize(){
+		this.Broadcast_subscribe.put(TickBroadcast.class, new LinkedList<>());
+		this.Broadcast_subscribe.put(TerminateBroadcast.class, new LinkedList<>());
+		this.Broadcast_subscribe.put(PublishConferenceBroadcast.class, new LinkedList<>());
+
+		this.event_subscribe.put(TrainModelEvent.class, new LinkedList<>());
+		this.event_subscribe.put(TestModelEvent.class, new LinkedList<>());
+		this.event_subscribe.put(PublishResultsEvent.class, new LinkedList<>());
+
 	}
 
 	private static class MessageBusImplHolder{
@@ -73,7 +84,7 @@ public class MessageBusImpl implements MessageBus {
 		LinkedList<MicroService> list = Broadcast_subscribe.get(b);
 		for (MicroService m:list) {
 			microService_queues.get(m.getName()).add(b);
-			microService_queues.notifyAll();
+			notifyAll();
 		}
 	}
 
@@ -130,7 +141,7 @@ public class MessageBusImpl implements MessageBus {
 		if(!isRegistered(m))
 			throw new IllegalArgumentException();
 		if(microService_queues.get(m.getName()).isEmpty())
-			microService_queues.wait();
+			wait();
 
 		return microService_queues.get(m.getName()).poll();
 	}

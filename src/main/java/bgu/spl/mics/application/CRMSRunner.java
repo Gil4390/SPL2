@@ -62,7 +62,7 @@ public class CRMSRunner {
         cluster.AddGPUS(GPUS);
 
         TimeService timeService = new TimeService(TICK_TIME, DURATION);
-
+        timeService.run();
         for (int i = 0; i < STUDENTS.size(); i++) {
             STUDENTS.elementAt(i).act();
         }
