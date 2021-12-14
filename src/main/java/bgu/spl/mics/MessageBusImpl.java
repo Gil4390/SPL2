@@ -23,7 +23,9 @@ public class MessageBusImpl implements MessageBus {
 	private TimeService timeService;
 
 	private MessageBusImpl() {
-		//todo make this function a thread save
+		event_subscribe = new HashMap<>();
+		Broadcast_subscribe= new HashMap<>();
+		microService_queues = new HashMap<>();
 	}
 
 	private static class MessageBusImplHolder{
