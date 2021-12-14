@@ -14,11 +14,9 @@ public class DataBatch {
     public DataBatch(int index,Data data) {
         this.start_index = index;
         this.data = data;
-        switch(data.getType()){
-            case Images: this.processTime = 4;
-            case Text: this.processTime = 2;
-            case Tabular: this.processTime = 1;
-        }
+        if(data.getTypeString() == "Images") this.processTime = 4;
+        if(data.getTypeString() == "Text") this.processTime = 2;
+        if(data.getTypeString() == "Tabular") this.processTime = 1;
     }
 
     public int getProcessTime(){

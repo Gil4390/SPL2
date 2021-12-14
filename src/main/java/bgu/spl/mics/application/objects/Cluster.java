@@ -45,35 +45,34 @@ public class Cluster {
 	}
 
 	public void ReceiveDataFromCpu(Pair<DataBatch,Integer> dataBatchPair, int cpuID){
-		System.out.println("received from CPU, id:" + cpuID);
 		GPU tempGPU= GPUs.get(dataBatchPair.getSecond());
 		statistics.AddNumberOfDataBatchProcessedByCpu();
 		synchronized(tempGPU) {
+			System.out.println("received from CPU, id:" + cpuID);
 			tempGPU.ReceiveProcessedData(dataBatchPair.getFirst());
 			if (!CPUs.get(cpuID).getSecond().isEmpty())
 				CPUs.get(cpuID).getFirst().ReceiveUnProcessedData(CPUs.get(cpuID).getSecond().remove());
 		}
 	}
 	public void ReceiveDataFromGpu(Pair<DataBatch,Integer> dataBatchPair){//todo need to do a better thread save function
-		System.out.println("received from GPU, id:" + dataBatchPair.getSecond());
-		Pair<CPU, Queue<Pair<DataBatch,Integer>>> temp =CPUs.get(cpuRoundIndex);
+		Pair<CPU, Queue<Pair<DataBatch,Integer>>> temp =CPUs.get(cpuRoundIndex.intValue());
 		synchronized(temp) {
 			temp.getSecond().add(dataBatchPair);
-			if (!CPUs.get(cpuRoundIndex).getSecond().isEmpty() & CPUs.get(cpuRoundIndex).getFirst().isReady())
-				CPUs.get(cpuRoundIndex).getFirst().ReceiveUnProcessedData(CPUs.get(cpuRoundIndex).getSecond().remove());
-			if (CPUs.size() == cpuRoundIndex.get()) {
-				if(cpuRoundIndex.compareAndSet(CPUs.size(),0)){}
+			if (!CPUs.get(cpuRoundIndex.intValue()).getSecond().isEmpty() & CPUs.get(cpuRoundIndex.intValue()).getFirst().isReady())
+				CPUs.get(cpuRoundIndex.intValue()).getFirst().ReceiveUnProcessedData(CPUs.get(cpuRoundIndex.intValue()).getSecond().remove());
+			if (CPUs.size()-1 == cpuRoundIndex.intValue()) {
+				if(cpuRoundIndex.compareAndSet(CPUs.size()-1,0)){}
 				else{
 					int val;
 					do{
-						val=cpuRoundIndex.get();
+						val=cpuRoundIndex.intValue();
 					}while(!cpuRoundIndex.compareAndSet(val,val+1));
 				}
 			}
 			else {
 				int val;
 				do{
-					val=cpuRoundIndex.get();
+					val=cpuRoundIndex.intValue();
 				}while(!cpuRoundIndex.compareAndSet(val,val+1));
 			}
 		}

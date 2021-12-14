@@ -88,8 +88,6 @@ public class GPU {
         ready=false;
         model=m;
         DivideDataBatch();
-        while(processingDataBatch.size() < capacity && indexUPDB<processingDataBatch.size())
-            SendDataBatch();
     }
 
 
@@ -158,9 +156,14 @@ public class GPU {
      * @post this.indexUPDB = @pre(indexUPDB)+1
      */
     private void SendDataBatch(){
-        Pair tempPair = new  <DataBatch,Integer> Pair(unProcessedDataBatch[indexUPDB],id);
-        cluster.ReceiveDataFromGpu(tempPair);
-        indexUPDB++;
+        int counter = 0;
+        while(counter < (capacity- processingDataBatch.size()) && indexUPDB<unProcessedDataBatch.length) {
+            System.out.println("sent from GPU, id:" + id);
+            Pair tempPair = new  <DataBatch,Integer> Pair(unProcessedDataBatch[indexUPDB],id);
+            cluster.ReceiveDataFromGpu(tempPair);
+            indexUPDB++;
+            counter++;
+        }
     }
 
     /**

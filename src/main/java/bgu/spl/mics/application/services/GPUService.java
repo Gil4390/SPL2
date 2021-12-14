@@ -47,7 +47,9 @@ public class GPUService extends MicroService {
     private void tick(){
         clock++;
         gpu.tick();
-        nextEvent();
+        if(gpu.isReady()) {
+            nextEvent();
+        }
     }
 
     private void TrainModelEvent(TrainModelEvent event){
@@ -68,6 +70,7 @@ public class GPUService extends MicroService {
         else {
             gpu.TestModel(event.getModel());
             //TODO need to notify that model result changed
+
             nextEvent();
         }
     }

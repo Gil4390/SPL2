@@ -34,13 +34,14 @@ public class CPU {
      * @post ths.ready = false;
      */
     public synchronized void ReceiveUnProcessedData(Pair<DataBatch,Integer> databatchPair){
+        System.out.println("received from Gpu, id:" + databatchPair.getSecond());
         if(ready) {
             this.databatchPair = databatchPair;
             ready = false;
             endProcessedTime = processedTime + (32 / cores) * databatchPair.getFirst().getProcessTime();
         }
         else{
-            System.out.println("entered function ReceiveUnProcessedData when cpu ready was false");
+            System.out.println("entered function ReceiveUnProcessedData when cpu ready was false, CPUID: " + this.id);
         }
     }
 
@@ -57,10 +58,10 @@ public class CPU {
         if(!ready)
             cluster.getStatistics().AddCpu_TimeUsed();
         if(!ready & processedTime==endProcessedTime){
-            cluster.ReceiveDataFromCpu(databatchPair, this.id);
             endProcessedTime=0;
-            databatchPair=null;
             ready=true;
+            cluster.ReceiveDataFromCpu(databatchPair, this.id);
+            //databatchPair=null;
         }
     }
 

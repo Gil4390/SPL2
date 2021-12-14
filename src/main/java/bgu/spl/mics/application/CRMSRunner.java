@@ -65,8 +65,11 @@ public class CRMSRunner {
         catch (Exception e){
 
         }
+
         TimeService timeService = new TimeService(TICK_TIME, DURATION);
-        timeService.run();
+        Thread timeThread = new Thread(timeService);
+        timeThread.start();
+
         for (int i = 0; i < STUDENTS.size(); i++) {
             STUDENTS.elementAt(i).act();
         }

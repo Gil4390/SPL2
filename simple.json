@@ -10,12 +10,12 @@
         {
           "name": "YOLO10",
           "type": "images",
-          "size": 200000
+          "size": 3000
         },
         {
           "name": "ResNet9000",
           "type": "images",
-          "size": 200000
+          "size": 4000
         }
       ]
 
@@ -29,7 +29,7 @@
         {
           "name": "VIT",
           "type": "images",
-          "size": 100000000
+          "size": 5000
         }
       ]
 
@@ -42,5 +42,5 @@
     {"name": "ICML", "date": 2000}
   ],
   "TickTime": 50,
-  "Duration": 100
+  "Duration": 40
 }

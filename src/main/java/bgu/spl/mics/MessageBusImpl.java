@@ -97,7 +97,7 @@ public class MessageBusImpl implements MessageBus {
 		Queue<MicroService> queue = event_subscribe.get(e.getClass());
 		MicroService m = queue.poll();
 		microService_queues.get(m.getName()).add(e);
-		microService_queues.notifyAll();
+		notifyAll();
 		queue.add(m);
 		return e.getFuture();
 	}
