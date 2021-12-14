@@ -32,6 +32,7 @@ public class GPU {
     private int timeClock;
     private int trainingTime;
 
+    private boolean finishTrainModel;
     private boolean ready;
 
     public GPU(String type,Cluster cluster, int id){
@@ -51,10 +52,12 @@ public class GPU {
 
         GPUService gpuService = new GPUService(this);
         ready=true;
+        finishTrainModel=false;
     }
 
     public void TestModel(Model m){
         ready = false;
+        finishTrainModel=false;
         this.model = m;
         Random rnd = new Random();
         if(rnd.nextDouble() < m.getTestProbability()){
@@ -77,15 +80,18 @@ public class GPU {
             TrainModel();
             SendDataBatch();
             cluster.getStatistics().AddGpu_TimeUsed();
-        }
-        if(countPDB==processingDataBatch.size() && countPDB!=0 && !ready){
-            cluster.finishTrainModel(model.getName());
-            Finish();
+
+            if (unProcessedDataBatch!=null && countPDB == unProcessedDataBatch.length & countPDB != 0) {
+                cluster.finishTrainModel(model.getName());
+                finishTrainModel = true;
+                Finish();
+            }
         }
     }
 
     public void TrainModelEvent(Model m){
         ready=false;
+        finishTrainModel=false;
         model=m;
         DivideDataBatch();
     }
@@ -122,7 +128,7 @@ public class GPU {
      * @post this.trainingTime =0;
      */
     private void Finish(){
-        model=null;
+        //model=null;
         countPDB=0;
         indexUPDB=0;
         trainingTime=0;
@@ -255,4 +261,7 @@ public class GPU {
         return id;
     }
 
+    public boolean isFinishTrainModel() {
+        return finishTrainModel;
+    }
 }

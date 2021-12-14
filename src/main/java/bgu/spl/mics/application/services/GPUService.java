@@ -27,6 +27,7 @@ public class GPUService extends MicroService {
     private Queue<Pair<TrainModelEvent,Integer>> TrainModelEventQueue;
     private Queue<Pair<TestModelEvent,Integer>> TestModelEventQueue;
     int clock;
+    private Event currentEvent;
 
     public GPUService(GPU gpu) {
         super("GPU - " + (gpu.getId()) + " Service");
@@ -34,6 +35,7 @@ public class GPUService extends MicroService {
         TrainModelEventQueue = new LinkedList<>();
         TestModelEventQueue = new LinkedList<>();
         clock=0;
+        currentEvent=null;
     }
 
     @Override
@@ -48,6 +50,8 @@ public class GPUService extends MicroService {
         clock++;
         gpu.tick();
         if(gpu.isReady()) {
+            if(gpu.isFinishTrainModel())
+                complete(currentEvent,currentEvent.getFuture());
             nextEvent();
         }
     }
@@ -58,6 +62,7 @@ public class GPUService extends MicroService {
             TrainModelEventQueue.add(pair);
         }
         else {
+            currentEvent=event;
             gpu.TrainModelEvent(event.getModel());
         }
     }
@@ -68,6 +73,8 @@ public class GPUService extends MicroService {
             TestModelEventQueue.add(pair);
         }
         else {
+            currentEvent=event;
+            System.out.println("TestModelEvent, from GPU:"+ gpu.getId());
             gpu.TestModel(event.getModel());
             complete(event,false);
             nextEvent();
