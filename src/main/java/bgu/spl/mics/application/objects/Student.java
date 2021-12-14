@@ -25,7 +25,6 @@ public class Student {
     private Degree status;
     private int publications;
     private int papersRead;
-    private StudentService studentService;
 
     private Queue<Model> models;
     private Queue<Model> TrainedModels;
@@ -39,13 +38,8 @@ public class Student {
         this.models = new LinkedList<>();
         this.TrainedModels = new LinkedList<>();
         this.id = id;
-
-        studentService = new StudentService(this);
-
-        Thread studentThread = new Thread(studentService);
-        studentThread.start();
     }
-
+ /*
     public void act(){
         for (Model m : this.models){
             Model model = TrainModel(m);
@@ -59,9 +53,6 @@ public class Student {
 
     }
 
-    public void AddModel(Model m){
-        this.models.add(m);
-    }
 
     public Model TrainModel(Model model){
         Model trainedModel = studentService.TrainModel(model);
@@ -75,6 +66,12 @@ public class Student {
 
     public Boolean PublishModel(String name){
         return studentService.PublishResults(name);
+    }
+
+     */
+
+    public void AddModel(Model m){
+        this.models.add(m);
     }
 
     public String getName() {

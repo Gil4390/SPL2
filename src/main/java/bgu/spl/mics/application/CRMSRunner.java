@@ -20,6 +20,8 @@ import java.util.Vector;
  * In the end, you should output a text file.
  */
 public class CRMSRunner {
+    private static Vector<StudentService> StudentServices;
+
     public static void main(String[] args) {
         String students="";
         String gpus="";
@@ -30,7 +32,7 @@ public class CRMSRunner {
 
         MessageBusImpl messageBus = MessageBusImpl.getInstance();
         //todo valid input
-        String path = "D:\\Amit Ganon\\Software Engineering\\semester C\\System programming - SPL\\SPL2\\simple.json";
+        String path = "C:\\Users\\gil43\\IdeaProjects\\SPL2\\simple.json";
         try {
             Gson gson = new Gson();
             Reader reader = Files.newBufferedReader(Paths.get(path));
@@ -48,6 +50,7 @@ public class CRMSRunner {
             System.out.println(e.getMessage());
         }
 
+        StudentServices = new Vector<>();
         Vector<Student> STUDENTS = JsonStringToStudentList(students);
         Vector<GPU> GPUS = JsonStringToGPUList(gpus);
         Vector<CPU> CPUS = JsonStringToCPUList(cpus);
@@ -66,13 +69,16 @@ public class CRMSRunner {
 
         }
 
-        TimeService timeService = new TimeService(TICK_TIME, DURATION);
-        Thread timeThread = new Thread(timeService);
-        timeThread.start();
 
-        for (int i = 0; i < STUDENTS.size(); i++) {
-            STUDENTS.elementAt(i).act();
+        for (int i = 0; i < StudentServices.size(); i++) {
+            Thread studentThread = new Thread(StudentServices.elementAt(i));
+            studentThread.start();
         }
+
+        TimeService timeService = new TimeService(TICK_TIME, DURATION);
+        //Thread timeThread = new Thread(timeService);
+        //timeThread.start();
+        timeService.run();
 
 
 
@@ -95,6 +101,8 @@ public class CRMSRunner {
             Student student = new Student(name, department, status, StudentID);
             StudentID++;
             Result.add(student);
+            StudentService studentService = new StudentService(student);
+            StudentServices.add(studentService);
             String[] models = str_split1[1].substring(1, str_split1[1].length()-1).split("}, ");
             for(String m : models){
                 String[] m_split = m.split(", ");
