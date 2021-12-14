@@ -22,8 +22,6 @@ public class MessageBusImpl implements MessageBus {
 
 	private TimeService timeService;
 
-	private ConferenceService conference;
-
 	private MessageBusImpl() {
 		//todo make this function a thread save
 	}

@@ -1,6 +1,5 @@
 package bgu.spl.mics.application.objects;
 
-import Callbacks.Gpu_Callback;
 import bgu.spl.mics.application.services.GPUService;
 
 import java.util.*;
