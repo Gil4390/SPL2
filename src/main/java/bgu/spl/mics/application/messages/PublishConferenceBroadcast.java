@@ -10,16 +10,18 @@ import java.util.Queue;
 
 public class PublishConferenceBroadcast implements Broadcast {
 
-    private Pair<Model,Integer>[] models;
+    private Pair<String,Integer>[] models;
 
-    public PublishConferenceBroadcast(Queue<Pair<Model,Integer>> models) {
+    public PublishConferenceBroadcast(Queue<Pair<String,Integer>> models) {
         this.models = new Pair[models.size()];
-        for (int i=0; i< models.size(); i++){
-            this.models[i] = models.poll();
+        int count =0;
+        for (Pair<String,Integer> pair:models){
+            this.models[count] = new Pair<>(pair.getFirst(),pair.getSecond());
+            count++;
         }
     }
 
-    public Pair<Model, Integer>[] getModels() {
+    public Pair<String, Integer>[] getModels() {
         return models;
     }
 

@@ -28,13 +28,13 @@ public class ConferenceService extends MicroService {
 
     @Override
     protected void initialize() {
-        subscribeEvent(PublishResultsEvent.class, (PublishResultsEvent)->{PublishResults(PublishResultsEvent.getModel(),PublishResultsEvent.getSenderId());});
+        subscribeEvent(PublishResultsEvent.class, (PublishResultsEvent)->{PublishResults(PublishResultsEvent.getModelName(),PublishResultsEvent.getSenderId());});
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast)->{PublishConference();});
         subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{terminate();});
     }
 
-    public void PublishResults(Model model, int id){
-        this.conf.addSuccessfulModel(new Pair(model, id));
+    public void PublishResults(String modelName, int id){
+        this.conf.addSuccessfulModel(new Pair(modelName, id));
     }
 
     public void PublishConference(){

@@ -31,7 +31,7 @@ public class CRMSRunner {
 
         MessageBusImpl messageBus = MessageBusImpl.getInstance();
         //todo valid input
-        //String path_amit = "D:\\Amit Ganon\\Software Engineering\\semester C\\System programming - SPL\\SPL2\\simple.json";
+        String path_amit = "D:\\Amit Ganon\\Software Engineering\\semester C\\System programming - SPL\\SPL2\\simple.json";
         //String path_gil = "C:\\Users\\gil43\\IdeaProjects\\SPL2\\simple.json";
         try {
             Gson gson = new Gson();
@@ -197,11 +197,11 @@ public class CRMSRunner {
             ConfrenceInformation c = conferences.elementAt(i);
             OutModel[] models = new OutModel[c.getSuccessfulModels().size()];
             for(int j = 0; j < c.getSuccessfulModels().size(); j++){
-                Pair<Model, Integer> p = c.getSuccessfulModels().poll();
+                Pair<String, Integer> p = c.getSuccessfulModels().poll();
                 for (Student student : students){
                     if(p.getSecond() == student.getId()){
                         for (Model s_model : student.getTrainedModels()){
-                            if(s_model.isPublished() && s_model.getName()==p.getFirst().getName()){
+                            if(s_model.isPublished() && s_model.getName()==p.getFirst()){
                                 //s_model = s_model; todo check what happened here
                                 Data data = s_model.getData();
                                 OutData outdata = new OutData(data.getTypeString(), data.getSize());

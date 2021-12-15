@@ -12,7 +12,7 @@ public class ConfrenceInformation {
 
     private String name;
     private int date;
-    private Queue<Pair<Model,Integer>> successfulModels;
+    private Queue<Pair<String,Integer>> successfulModels;
 
     public ConfrenceInformation(String name, int date) {
         this.successfulModels = new LinkedList<>();
@@ -37,11 +37,11 @@ public class ConfrenceInformation {
                 '}';
     }
 
-    public Queue<Pair<Model, Integer>> getSuccessfulModels() {
+    public Queue<Pair<String, Integer>> getSuccessfulModels() {
         return successfulModels;
     }
 
-    public void addSuccessfulModel(Pair<Model, Integer> successfulModel) {
+    public void addSuccessfulModel(Pair<String, Integer> successfulModel) {
         this.successfulModels.add(successfulModel);
     }
 }
