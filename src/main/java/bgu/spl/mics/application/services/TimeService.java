@@ -38,7 +38,7 @@ public class TimeService extends MicroService {
 	private void act() {
 		TickBroadcast tickBroadcast = new TickBroadcast();
 		while (TickCount < duration) {
-			System.out.println("tick ========================================================"); //todo remove
+			System.out.println("tick ======================================================== " + TickCount); //todo remove
 			sendBroadcast(tickBroadcast);
 			TickCount++;
 			try {

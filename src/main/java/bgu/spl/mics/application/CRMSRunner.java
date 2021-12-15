@@ -30,9 +30,7 @@ public class CRMSRunner {
         String Duration = "";
 
         MessageBusImpl messageBus = MessageBusImpl.getInstance();
-        //todo valid input
-        String path_amit = "D:\\Amit Ganon\\Software Engineering\\semester C\\System programming - SPL\\SPL2\\simple.json";
-        //String path_gil = "C:\\Users\\gil43\\IdeaProjects\\SPL2\\simple.json";
+        //todo valid input?
         try {
             Gson gson = new Gson();
             Reader reader = Files.newBufferedReader(Paths.get("simple.json"));
