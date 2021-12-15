@@ -78,7 +78,7 @@ public class GPU {
      * @post this.timeClock == @pre(this.timeClock)+1
      */
     public void tick(){
-        timeClock++;
+        timeClock++;//todo atomic
         if(!ready) {
             TrainModel();
             SendDataBatch();

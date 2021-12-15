@@ -54,7 +54,7 @@ public class CPU {
      * @post this.databatch == @pre(databatch) | @post(databatch) == null
      */
     public void tickAndCompute(){
-        processedTime++;
+        processedTime++; // todo atomic
         if(!ready)
             cluster.getStatistics().AddCpu_TimeUsed();
         if(!ready & processedTime==endProcessedTime){

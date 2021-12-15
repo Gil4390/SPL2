@@ -24,7 +24,7 @@ public class Cluster {
 	private AtomicInteger cpuRoundIndex;
 
 	private Statistics statistics;
-	private Cluster(){
+	private Cluster(){//todo maby do a line of databatch and for evey cpu that get free he will poll from this line
 		statistics= new Statistics();
 		cpuRoundIndex=new AtomicInteger(0);
 

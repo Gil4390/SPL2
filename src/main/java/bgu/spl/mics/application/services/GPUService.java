@@ -48,6 +48,9 @@ public class GPUService extends MicroService {
 
     private void tick(){
         clock++;
+        if(clock==82){
+           int x=2;
+        }
         gpu.tick();
         if(gpu.isReady()) {
             if(gpu.isFinishTrainModel())

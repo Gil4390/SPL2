@@ -95,10 +95,12 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public synchronized <T> Future<T> sendEvent(Event<T> e) {
 		Queue<MicroService> queue = event_subscribe.get(e.getClass());
-		MicroService m = queue.poll();
-		microService_queues.get(m.getName()).add(e);
-		notifyAll();
-		queue.add(m);
+		if(!queue.isEmpty()) {
+			MicroService m = queue.poll();
+			microService_queues.get(m.getName()).add(e);
+			queue.add(m);
+			notifyAll();
+		}
 		return e.getFuture();
 	}
 
@@ -120,7 +122,7 @@ public class MessageBusImpl implements MessageBus {
 			for(int i=0; i<queue.size();i++){
 				MicroService temp = queue.poll();
 				if(temp.getName()!=m.getName())
-					queue.add(m);
+					queue.add(temp);
 			}
 		}
 		for (LinkedList<MicroService> list:Broadcast_subscribe.values()) {

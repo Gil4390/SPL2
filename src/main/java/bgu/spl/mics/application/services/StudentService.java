@@ -47,16 +47,19 @@ public class StudentService extends MicroService {
     }
 
     public Model TrainModel(Model model){
+        System.out.println("student id:"+student.getId()+", send TrainModel event with model name:"+model.getName());
         TrainModelEvent trainEvent = new TrainModelEvent(this.student.getId(), model);
         return sendEvent(trainEvent).get();
     }
 
     public Boolean TestModel(Model model){
+        System.out.println("student id:"+student.getId()+", send TestModel event with model name:"+model.getName());
         TestModelEvent testEvent = new TestModelEvent(this.student.getId(), model);
         return sendEvent(testEvent).get();
     }
 
     public void PublishResults(Model model){
+        System.out.println("student id:"+student.getId()+", send PublishResults event with model name:"+model.getName());
         PublishResultsEvent publishEvent = new PublishResultsEvent(this.student.getId(), model.getName());
         sendEvent(publishEvent);
     }
