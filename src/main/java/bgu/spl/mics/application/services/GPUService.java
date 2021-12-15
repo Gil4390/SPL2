@@ -74,8 +74,8 @@ public class GPUService extends MicroService {
         }
         else {
             currentEvent=event;
-            System.out.println("--------------------------------------------------TestModelEvent, from GPU:"+ gpu.getId());
             gpu.TestModel(event.getModel());
+            System.out.println("TestModelEvent, from GPU:"+ gpu.getId()+"  , the test from model name:"+event.getModel().getName()+" , test result:"+event.getModel().getResultString());
             if(event.getModel().getResultString() == "Good")
                 complete(event,true);
             else{

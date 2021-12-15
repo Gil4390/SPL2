@@ -195,12 +195,12 @@ public class CRMSRunner {
             ConfrenceInformation c = conferences.elementAt(i);
             OutModel[] models = new OutModel[c.getSuccesfulModels().size()];
             for(int j = 0; j < c.getSuccesfulModels().size(); j++){
-                Pair<String, Integer> p = c.getSuccesfulModels().poll();
+                Pair<Model, Integer> p = c.getSuccesfulModels().poll();
                 for (Student student : students){
                     if(p.getSecond() == student.getId()){
                         for (Model s_model : student.getTrainedModels()){
-                            if(s_model.isPublished() && s_model.getName()==p.getFirst()){
-                                s_model = s_model;
+                            if(s_model.isPublished() && s_model.getName()==p.getFirst().getName()){
+                                //s_model = s_model; todo check what happened here
                                 Data data = s_model.getData();
                                 OutData outdata = new OutData(data.getTypeString(), data.getSize());
                                 models[j] = new OutModel(s_model.getName(), outdata, s_model.getStatusString(), s_model.getResultString());

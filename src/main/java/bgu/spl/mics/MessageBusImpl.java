@@ -72,7 +72,7 @@ public class MessageBusImpl implements MessageBus {
 	 */
 	@Override
 	public synchronized <T> void complete(Event<T> e, T result) {
-		e.getFuture().resolve(result);
+		e.getFuture().resolve(result);//todo need to understand what to to here
 	}
 
 	/**

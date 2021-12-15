@@ -33,6 +33,10 @@ public class TestModelEvent implements Event<Boolean> {
         return model;
     }
 
+    public void setFuture(Future<Boolean> future) {
+        this.future = future;
+    }
+
     public void setModel(Model model) {
         this.model = model;
     }

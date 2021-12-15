@@ -36,4 +36,8 @@ public class PublishResultsEvent implements Event<Boolean> {
     public void setModelName(String modelName) {
         this.modelName = modelName;
     }
+
+    public void setFuture(Future<Boolean> future) {
+        this.future = future;
+    }
 }

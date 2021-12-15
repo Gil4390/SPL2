@@ -25,6 +25,7 @@ public class Model {
         this.status = Status.PreTrained;
         this.TestProbability = testProbability;
         this.result = Result.None;
+        published=false;
     }
 
     public String getName() {

@@ -40,33 +40,30 @@ public class StudentService extends MicroService {
             Model model = TrainModel(m);
             this.student.getTrainedModels().add(model);
             if (TestModel(model)) {
-                System.out.println("student: "+ student.getId()+", model was tested and return the result: "+ model.getResultString());
-                if (PublishResults(model.getName())) {
-                    model.setPublished(true);
-                }
+                PublishResults(model.getName());
             }
+            System.out.println("student: "+ student.getId()+", model:"+m.getName()+", was tested and return the result: "+ model.getResultString());
         }
     }
 
     public Model TrainModel(Model model){
         TrainModelEvent trainEvent = new TrainModelEvent(this.student.getId(), model);
-        sendEvent(trainEvent);
-        return trainEvent.getFuture().get();
+        return sendEvent(trainEvent).get();
     }
 
     public Boolean TestModel(Model model){
         TestModelEvent testEvent = new TestModelEvent(this.student.getId(), model);
-        sendEvent(testEvent);
-        return testEvent.getFuture().get();
+        return sendEvent(testEvent).get();
     }
 
-    public Boolean PublishResults(String name){
+    public void PublishResults(String name){
         PublishResultsEvent publishEvent = new PublishResultsEvent(this.student.getId(), name);
-        return publishEvent.getFuture().get();
+        sendEvent(publishEvent);
     }
 
     private void PublishConferenceBroadcast(PublishConferenceBroadcast event){
-        for (Pair<String,Integer> pair:event.getModels()) {
+        for (Pair<Model,Integer> pair:event.getModels()) {
+            pair.getFirst().setPublished(true);
             if(student.getId()==pair.getSecond())
                 student.setPublications(student.getPublications()+1);
             else{
