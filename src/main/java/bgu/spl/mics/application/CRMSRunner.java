@@ -196,13 +196,12 @@ public class CRMSRunner {
         for(int i = 0; i < conferences.size(); i++){
             ConfrenceInformation c = conferences.elementAt(i);
             OutModel[] models = new OutModel[c.getSuccessfulModels().size()];
-            for(int j = 0; j < c.getSuccessfulModels().size(); j++){
-                Pair<String, Integer> p = c.getSuccessfulModels().poll();
+            int j = 0;
+            for(Pair<String, Integer> p : c.getSuccessfulModels()){
                 for (Student student : students){
                     if(p.getSecond() == student.getId()){
                         for (Model s_model : student.getTrainedModels()){
                             if(s_model.isPublished() && s_model.getName()==p.getFirst()){
-                                //s_model = s_model; todo check what happened here
                                 Data data = s_model.getData();
                                 OutData outdata = new OutData(data.getTypeString(), data.getSize());
                                 models[j] = new OutModel(s_model.getName(), outdata, s_model.getStatusString(), s_model.getResultString());
@@ -210,6 +209,7 @@ public class CRMSRunner {
                         }
                     }
                 }
+                j++;
             }
             outConferences[i] = new OutConference(c.getName(), c.getDate(), models);
         }
