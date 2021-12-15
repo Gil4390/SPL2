@@ -40,7 +40,7 @@ public class StudentService extends MicroService {
             Model model = TrainModel(m);
             this.student.getTrainedModels().add(model);
             if (TestModel(model)) {
-                PublishResults(model.getName());
+                PublishResults(model);
             }
             System.out.println("student: "+ student.getId()+", model:"+m.getName()+", was tested and return the result: "+ model.getResultString());
         }
@@ -56,8 +56,8 @@ public class StudentService extends MicroService {
         return sendEvent(testEvent).get();
     }
 
-    public void PublishResults(String name){
-        PublishResultsEvent publishEvent = new PublishResultsEvent(this.student.getId(), name);
+    public void PublishResults(Model model){
+        PublishResultsEvent publishEvent = new PublishResultsEvent(this.student.getId(), model);
         sendEvent(publishEvent);
     }
 

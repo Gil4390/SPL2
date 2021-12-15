@@ -1,13 +1,10 @@
 package bgu.spl.mics.application.services;
 
-import bgu.spl.mics.MessageBus;
-import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.*;
 import bgu.spl.mics.application.objects.ConfrenceInformation;
+import bgu.spl.mics.application.objects.Model;
 import bgu.spl.mics.application.objects.Pair;
-
-import java.util.PriorityQueue;
 
 /**
  * Conference service is in charge of
@@ -31,19 +28,19 @@ public class ConferenceService extends MicroService {
 
     @Override
     protected void initialize() {
-        subscribeEvent(PublishResultsEvent.class, (PublishResultsEvent)->{PublishResults(PublishResultsEvent.getModelName(),PublishResultsEvent.getSenderId());});
+        subscribeEvent(PublishResultsEvent.class, (PublishResultsEvent)->{PublishResults(PublishResultsEvent.getModel(),PublishResultsEvent.getSenderId());});
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast)->{PublishConference();});
         subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{terminate();});
     }
 
-    public void PublishResults(String modelName, int id){
-        this.conf.addSuccesfulModel(new Pair(modelName, id));
+    public void PublishResults(Model model, int id){
+        this.conf.addSuccessfulModel(new Pair(model, id));
     }
 
     public void PublishConference(){
         date++;
         if(date==conf.getDate()) {
-            PublishConferenceBroadcast publish = new PublishConferenceBroadcast(this.conf.getSuccesfulModels());
+            PublishConferenceBroadcast publish = new PublishConferenceBroadcast(this.conf.getSuccessfulModels());
             sendBroadcast(publish);
             this.terminate();
         }

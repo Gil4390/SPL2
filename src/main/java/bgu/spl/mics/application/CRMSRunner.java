@@ -10,9 +10,7 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Vector;
 
 /** This is the Main class of Compute Resources Management System application. You should parse the input file,
@@ -193,9 +191,9 @@ public class CRMSRunner {
         OutConference[] outConferences = new OutConference[conferences.size()];
         for(int i = 0; i < conferences.size(); i++){
             ConfrenceInformation c = conferences.elementAt(i);
-            OutModel[] models = new OutModel[c.getSuccesfulModels().size()];
-            for(int j = 0; j < c.getSuccesfulModels().size(); j++){
-                Pair<Model, Integer> p = c.getSuccesfulModels().poll();
+            OutModel[] models = new OutModel[c.getSuccessfulModels().size()];
+            for(int j = 0; j < c.getSuccessfulModels().size(); j++){
+                Pair<Model, Integer> p = c.getSuccessfulModels().poll();
                 for (Student student : students){
                     if(p.getSecond() == student.getId()){
                         for (Model s_model : student.getTrainedModels()){

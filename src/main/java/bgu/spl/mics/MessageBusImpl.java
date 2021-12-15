@@ -124,10 +124,7 @@ public class MessageBusImpl implements MessageBus {
 			}
 		}
 		for (LinkedList<MicroService> list:Broadcast_subscribe.values()) {
-			for (MicroService temp:list) {
-				if(temp.getName()==m.getName())
-					list.remove(temp);
-			}
+			list.removeIf(temp -> temp.getName() == m.getName());
 		}
 		microService_queues.remove(m.getName());
 	}

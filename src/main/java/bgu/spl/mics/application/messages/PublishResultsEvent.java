@@ -9,11 +9,11 @@ public class PublishResultsEvent implements Event<Boolean> {
 
     private int senderID;
     private Future<Boolean> future;
-    private String modelName;
+    private Model model;
 
-    public PublishResultsEvent(int senderID, String name) {
+    public PublishResultsEvent(int senderID, Model model) {
         this.senderID = senderID;
-        this.modelName = name;
+        this.model = model;
         future = new Future<>();
     }
 
@@ -29,12 +29,12 @@ public class PublishResultsEvent implements Event<Boolean> {
         return senderID;
     }
 
-    public String getModelName() {
-        return modelName;
+    public Model getModel() {
+        return model;
     }
 
-    public void setModelName(String modelName) {
-        this.modelName = modelName;
+    public void setModel(Model model) {
+        this.model = model;
     }
 
     public void setFuture(Future<Boolean> future) {
