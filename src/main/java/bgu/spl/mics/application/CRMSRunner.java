@@ -7,6 +7,7 @@ import bgu.spl.mics.application.services.*;
 import com.google.gson.Gson;
 
 import java.io.Reader;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -30,10 +31,11 @@ public class CRMSRunner {
 
         MessageBusImpl messageBus = MessageBusImpl.getInstance();
         //todo valid input
-        String path = "D:\\Amit Ganon\\Software Engineering\\semester C\\System programming - SPL\\SPL2\\simple.json";
+        //String path_amit = "D:\\Amit Ganon\\Software Engineering\\semester C\\System programming - SPL\\SPL2\\simple.json";
+        //String path_gil = "C:\\Users\\gil43\\IdeaProjects\\SPL2\\simple.json";
         try {
             Gson gson = new Gson();
-            Reader reader = Files.newBufferedReader(Paths.get(path));
+            Reader reader = Files.newBufferedReader(Paths.get("simple.json"));
             Map<?, ?> map = gson.fromJson(reader, Map.class);
             for (Map.Entry<?, ?> entry : map.entrySet()) {
                 if (entry.getKey().equals("Students"))  students = entry.getValue().toString();
@@ -83,6 +85,7 @@ public class CRMSRunner {
         OutputJSON outputJSON = CreateOutputObject(STUDENTS, CONFERENCES, cluster);
         String jsonString = ConvertObjectToJSONString(outputJSON);
         System.out.println(jsonString);
+        SaveJSONObject(outputJSON);
     }
 
 
@@ -179,11 +182,12 @@ public class CRMSRunner {
         for(int i = 0; i < students.size(); i++){
             Student s = students.elementAt(i);
             OutModel[] models = new OutModel[s.getTrainedModels().size()];
-            for(int j = 0; j < s.getTrainedModels().size(); j++){
-                Model m = s.getTrainedModels().poll();
+            int j = 0;
+            for(Model m : s.getTrainedModels()){
                 Data data = m.getData();
                 OutData outdata = new OutData(data.getTypeString(), data.getSize());
                 models[j] = new OutModel(m.getName(), outdata, m.getStatusString(), m.getResultString());
+                j++;
             }
             outStudents[i] = new OutStudent(s.getName(), s.getDepartment(), s.getStatus().toString(), s.getPublications(), s.getPapersRead(), models);
         }
@@ -226,5 +230,16 @@ public class CRMSRunner {
             ex.printStackTrace();
         }
         return json;
+    }
+
+    public static void SaveJSONObject(OutputJSON out){
+        try {
+            Gson gson = new Gson();
+            Writer writer = Files.newBufferedWriter(Paths.get("output.json"));
+            gson.toJson(out, writer);
+            writer.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }
