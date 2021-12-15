@@ -27,7 +27,7 @@ public class Student {
     private int papersRead;
 
     private Queue<Model> models;
-    private Queue<Model> TrainedModels;
+    private LinkedList<Model> TrainedModels;
 
     public Student(String name, String department, String degree, int id){
         this.name = name;
@@ -36,39 +36,9 @@ public class Student {
         publications = 0;
         papersRead = 0;
         this.models = new LinkedList<>();
-        this.TrainedModels = new LinkedList<>();
+        this.TrainedModels =new <Model> LinkedList ();
         this.id = id;
     }
- /*
-    public void act(){
-        for (Model m : this.models){
-            Model model = TrainModel(m);
-            TrainedModels.add(model);
-            if(TestModel(model)){
-                if(PublishModel(model.getName())){
-                    model.setPublished(true);
-                }
-            }
-        }
-
-    }
-
-
-    public Model TrainModel(Model model){
-        Model trainedModel = studentService.TrainModel(model);
-        return trainedModel;
-    }
-
-    public Boolean TestModel(Model model){
-        Boolean testedModel = studentService.TestModel(model);
-        return testedModel;
-    }
-
-    public Boolean PublishModel(String name){
-        return studentService.PublishResults(name);
-    }
-
-     */
 
     public void AddModel(Model m){
         this.models.add(m);
@@ -106,8 +76,12 @@ public class Student {
         this.status = status;
     }
 
-    public void setPublications(int publications) {
+    public void setPublications(int publications, String modelName) {
         this.publications = publications;
+        for (Model model:TrainedModels) {
+            if(model.getName()==modelName)
+                model.setPublished(true);
+        }
     }
 
     public void setPapersRead(int papersRead) {
@@ -122,7 +96,7 @@ public class Student {
         return models;
     }
 
-    public Queue<Model> getTrainedModels() {
+    public LinkedList<Model> getTrainedModels() {
         return TrainedModels;
     }
 

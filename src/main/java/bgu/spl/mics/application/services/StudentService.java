@@ -57,15 +57,14 @@ public class StudentService extends MicroService {
     }
 
     public void PublishResults(Model model){
-        PublishResultsEvent publishEvent = new PublishResultsEvent(this.student.getId(), model);
+        PublishResultsEvent publishEvent = new PublishResultsEvent(this.student.getId(), model.getName());
         sendEvent(publishEvent);
     }
 
     private void PublishConferenceBroadcast(PublishConferenceBroadcast event){
-        for (Pair<Model,Integer> pair:event.getModels()) {
-            pair.getFirst().setPublished(true);
+        for (Pair<String,Integer> pair:event.getModels()) {
             if(student.getId()==pair.getSecond())
-                student.setPublications(student.getPublications()+1);
+                student.setPublications(student.getPublications()+1, pair.getFirst());
             else{
                 student.setPapersRead(student.getPapersRead()+1);
             }
