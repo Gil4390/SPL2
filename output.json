@@ -1,1 +1,147 @@
-{"students":[{"name":"Simba","department":"Computer Science","status":"MSc","publications":0,"papersRead":0,"trainedModels":[{"name":"YOLO10","data":{"type":"Images","size":70000},"status":"Trained","results":"None"}]},{"name":"Zazu","department":"EE","status":"PhD","publications":0,"papersRead":0,"trainedModels":[{"name":"VIT","data":{"type":"Images","size":50000},"status":"Trained","results":"None"}]}],"conferences":[{"name":"ICML","date":80,"trainedModels":[]}],"cpuTimeUsed":720,"gpuTimeUsed":812,"batchesProcessed":120}
+{
+  "students": [
+    {
+      "name": "Simba",
+      "department": "Computer Science",
+      "status": "MSc",
+      "publications": 1,
+      "papersRead": 3,
+      "trainedModels": [
+        {
+          "name": "YOLO10",
+          "data": {
+            "type": "Images",
+            "size": 3000
+          },
+          "status": "Tested",
+          "results": "Good"
+        },
+        {
+          "name": "ResNet9000",
+          "data": {
+            "type": "Images",
+            "size": 4000
+          },
+          "status": "Tested",
+          "results": "Bad"
+        }
+      ]
+    },
+    {
+      "name": "Zazu",
+      "department": "EE",
+      "status": "PhD",
+      "publications": 1,
+      "papersRead": 3,
+      "trainedModels": [
+        {
+          "name": "VIT",
+          "data": {
+            "type": "Images",
+            "size": 5000
+          },
+          "status": "Tested",
+          "results": "Good"
+        }
+      ]
+    },
+    {
+      "name": "Nala",
+      "department": "Computer Science",
+      "status": "PhD",
+      "publications": 2,
+      "papersRead": 2,
+      "trainedModels": [
+        {
+          "name": "YOLO9000",
+          "data": {
+            "type": "Images",
+            "size": 10000
+          },
+          "status": "Tested",
+          "results": "Good"
+        },
+        {
+          "name": "VIT2",
+          "data": {
+            "type": "Images",
+            "size": 10000
+          },
+          "status": "Tested",
+          "results": "Good"
+        },
+        {
+          "name": "MuchMoreEfficientNet",
+          "data": {
+            "type": "Images",
+            "size": 20000
+          },
+          "status": "Tested",
+          "results": "Bad"
+        },
+        {
+          "name": "DenserNet",
+          "data": {
+            "type": "Images",
+            "size": 10000
+          },
+          "status": "Tested",
+          "results": "Good"
+        }
+      ]
+    }
+  ],
+  "conferences": [
+    {
+      "name": "ICML",
+      "date": 80,
+      "trainedModels": [
+        {
+          "name": "YOLO10",
+          "data": {
+            "type": "Images",
+            "size": 3000
+          },
+          "status": "Tested",
+          "results": "Good"
+        }
+      ]
+    },
+    {
+      "name": "ICML2",
+      "date": 180,
+      "trainedModels": [
+        {
+          "name": "VIT",
+          "data": {
+            "type": "Images",
+            "size": 5000
+          },
+          "status": "Tested",
+          "results": "Good"
+        },
+        {
+          "name": "YOLO9000",
+          "data": {
+            "type": "Images",
+            "size": 10000
+          },
+          "status": "Tested",
+          "results": "Good"
+        },
+        {
+          "name": "VIT2",
+          "data": {
+            "type": "Images",
+            "size": 10000
+          },
+          "status": "Tested",
+          "results": "Good"
+        }
+      ]
+    }
+  ],
+  "cpuTimeUsed": 372,
+  "gpuTimeUsed": 329,
+  "batchesProcessed": 62
+}

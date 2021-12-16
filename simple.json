@@ -72,6 +72,6 @@
     {"name": "ICML", "date": 80},
     {"name": "ICML2", "date": 180}
   ],
-  "TickTime": 50,
+  "TickTime": 10,
   "Duration": 350
 }

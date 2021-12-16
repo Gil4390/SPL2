@@ -5,6 +5,7 @@ import bgu.spl.mics.application.objects.*;
 import bgu.spl.mics.application.objects.OutputObjects.*;
 import bgu.spl.mics.application.services.*;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.Reader;
 import java.io.Writer;
@@ -223,7 +224,7 @@ public class CRMSRunner {
     public static String ConvertObjectToJSONString(OutputJSON out){
         String json = "";
         try {
-            json = new Gson().toJson(out);
+            json = new GsonBuilder().setPrettyPrinting().create().toJson(out);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -232,10 +233,11 @@ public class CRMSRunner {
 
     public static void SaveJSONObject(OutputJSON out){
         try {
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
             Writer writer = Files.newBufferedWriter(Paths.get("output.json"));
             gson.toJson(out, writer);
             writer.close();
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
