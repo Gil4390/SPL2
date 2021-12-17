@@ -43,7 +43,7 @@ public class GPUService extends MicroService {
         subscribeEvent(TrainModelEvent.class, (TrainModelEvent)->{TrainModelEvent(TrainModelEvent);});
         subscribeEvent(TestModelEvent.class, (TestModelEvent)->{TestModel(TestModelEvent);});
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast)->{tick();});
-        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{terminate();});
+        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{complete(currentEvent,null) ;terminate();});
     }
 
     private void tick(){

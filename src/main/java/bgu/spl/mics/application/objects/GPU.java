@@ -242,7 +242,7 @@ public class GPU {
         return trainingTime;
     }
 
-    public boolean isReady() {
+    public synchronized boolean isReady() {
         return ready;
     }
 

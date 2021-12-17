@@ -68,14 +68,6 @@ public class Student {
         this.name = name;
     }
 
-    public void setDepartment(String department) {
-        this.department = department;
-    }
-
-    public void setStatus(Degree status) {
-        this.status = status;
-    }
-
     public void setPublications(int publications, String modelName) {
         this.publications = publications;
         for (Model model:TrainedModels) {

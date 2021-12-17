@@ -21,11 +21,12 @@ import bgu.spl.mics.application.objects.Student;
 public class StudentService extends MicroService {
 
     private Student student;
+    Thread thread;
 
     public StudentService(Student student) {
         super("Student - " + student.getId() + " Service");
         this.student = student;
-
+        thread = new Thread( ()->activateModels());
     }
 
     @Override
@@ -36,35 +37,63 @@ public class StudentService extends MicroService {
     }
 
     public void act() {
+        Thread thread = new Thread( ()->activateModels());
+        thread.start();
+    }
+
+    public void activateModels(){
         for (Model m : this.student.getModels()) {
             Model model = TrainModel(m);
-            this.student.getTrainedModels().add(model);
-            if (TestModel(model)) {
-                PublishResults(model);
+            if(model!=null){
+                this.student.getTrainedModels().add(model);
+                try {
+                    if (TestModel(model)) {
+                        PublishResults(model);
+                    }
+                }
+                catch (NullPointerException e){
+                    System.out.println("Model return null for this micro service: "+getName() + "in methode: activateModels");
+                };
+                System.out.println("student: " + student.getId() + ", model:" + m.getName() + ", was tested and return the result: " + model.getResultString());
             }
-            System.out.println("student: "+ student.getId()+", model:"+m.getName()+", was tested and return the result: "+ model.getResultString());
+            else{
+                System.out.println("Model return null for this micro service: "+getName() + " in methode: activateModels");
+            }
         }
     }
 
     public Model TrainModel(Model model){
-        System.out.println("student id:"+student.getId()+", send TrainModel event with model name:"+model.getName());
-        TrainModelEvent trainEvent = new TrainModelEvent(this.student.getId(), model);
-        return sendEvent(trainEvent).get();
+        if(model != null) {
+            System.out.println("student id:" + student.getId() + ", send TrainModel event with model name:" + model.getName());
+            TrainModelEvent trainEvent = new TrainModelEvent(this.student.getId(), model);
+            return sendEvent(trainEvent).get();
+        }
+        System.out.println("Model return null for this micro service: "+getName() + "in methode: TrainModel");
+        return null;
     }
 
     public Boolean TestModel(Model model){
-        System.out.println("student id:"+student.getId()+", send TestModel event with model name:"+model.getName());
-        TestModelEvent testEvent = new TestModelEvent(this.student.getId(), model);
-        return sendEvent(testEvent).get();
+        if(model != null){
+            System.out.println("student id:"+student.getId()+", send TestModel event with model name:"+model.getName());
+            TestModelEvent testEvent = new TestModelEvent(this.student.getId(), model);
+            return sendEvent(testEvent).get();
+        }
+        System.out.println("Model return null for this micro service: "+getName() + "in methode: TestModel");
+        return false;
     }
 
     public void PublishResults(Model model){
-        System.out.println("student id:"+student.getId()+", send PublishResults event with model name:"+model.getName());
-        PublishResultsEvent publishEvent = new PublishResultsEvent(this.student.getId(), model.getName());
-        sendEvent(publishEvent);
+        if(model != null){
+            System.out.println("student id:" + student.getId() + ", send PublishResults event with model name:" + model.getName());
+            PublishResultsEvent publishEvent = new PublishResultsEvent(this.student.getId(), model.getName());
+            sendEvent(publishEvent);
+        }
+        else
+            System.out.println("Model return null for this micro service: "+getName() + "in methode: PublishResults");
     }
 
     private void PublishConferenceBroadcast(PublishConferenceBroadcast event){
+        System.out.println("the student id: " + student.getId() +",got an PublishConferenceBroadcast");
         for (Pair<String,Integer> pair:event.getModels()) {
             if(student.getId()==pair.getSecond())
                 student.setPublications(student.getPublications()+1, pair.getFirst());
