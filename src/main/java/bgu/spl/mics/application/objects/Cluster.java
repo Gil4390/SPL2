@@ -49,12 +49,13 @@ public class Cluster {
 		statistics.AddNumberOfDataBatchProcessedByCpu();
 		System.out.println("received from CPU, id:" + cpuID);
 		tempGPU.ReceiveProcessedData(dataBatchPair.getFirst());
-		synchronized(tempGPU) {
-			if (!CPUs.get(cpuID).getSecond().isEmpty())//todo check if cpu is ready
-				CPUs.get(cpuID).getFirst().ReceiveUnProcessedData(CPUs.get(cpuID).getSecond().remove());
+		Pair<CPU, Queue<Pair<DataBatch,Integer>>> temp =CPUs.get(cpuID);
+		synchronized(temp) {
+			if (!temp.getSecond().isEmpty() & temp.getFirst().isReady())
+				temp.getFirst().ReceiveUnProcessedData(temp.getSecond().remove());
 		}
 	}
-	public void ReceiveDataFromGpu(Pair<DataBatch,Integer> dataBatchPair){//todo need to do a better thread save function
+	public void ReceiveDataFromGpu(Pair<DataBatch,Integer> dataBatchPair){
 		Pair<CPU, Queue<Pair<DataBatch,Integer>>> temp =CPUs.get(cpuRoundIndex.intValue());
 		synchronized(temp) {
 			temp.getSecond().add(dataBatchPair);
@@ -65,8 +66,6 @@ public class Cluster {
 			do{
 				val=cpuRoundIndex.intValue()%CPUs.size();
 			}while(!cpuRoundIndex.compareAndSet(val,(val+1)%CPUs.size()));
-			System.out.println("-------------------------------------------------cpuRoundIndex: "+cpuRoundIndex.intValue());
-
 	}
 
 	public void finishTrainModel(String modelName){
