@@ -16,21 +16,19 @@ import java.util.concurrent.locks.ReadWriteLock;
 public class Cluster {
 
 
-	private HashMap<Integer,Pair<CPU, Queue<Pair<DataBatch,Integer>>>> CPUs;
+	private HashMap<Integer,CPU> CPUs;
 	private HashMap<Integer,GPU> GPUs;
 
-	private Queue<Pair<DataBatch,Integer>> dataBATCH_ForGPU;
-
-	private AtomicInteger cpuRoundIndex;
-
+	private Queue<Pair<DataBatch,Integer>> dataBATCH_ForCPU;
+	private Queue <CPU> CpuLine;
 	private Statistics statistics;
+
 	private Cluster(){//todo maby do a line of databatch and for evey cpu that get free he will poll from this line
 		statistics= new Statistics();
-		cpuRoundIndex=new AtomicInteger(0);
-
 		CPUs = new HashMap<>();
 		GPUs = new HashMap<>();
-		dataBATCH_ForGPU = new LinkedList<>();
+		dataBATCH_ForCPU = new LinkedList<>();
+		CpuLine= new LinkedList<>();
 	}
 	/**
      * Retrieves the single instance of this class.
@@ -49,23 +47,27 @@ public class Cluster {
 		statistics.AddNumberOfDataBatchProcessedByCpu();
 		System.out.println("received from CPU, id:" + cpuID);
 		tempGPU.ReceiveProcessedData(dataBatchPair.getFirst());
-		Pair<CPU, Queue<Pair<DataBatch,Integer>>> temp =CPUs.get(cpuID);
-		synchronized(temp) {
-			if (!temp.getSecond().isEmpty() & temp.getFirst().isReady())
-				temp.getFirst().ReceiveUnProcessedData(temp.getSecond().remove());
+		CPU c = CPUs.get(cpuID);
+		synchronized (CpuLine) {
+			synchronized (dataBATCH_ForCPU) {
+				if (dataBATCH_ForCPU.isEmpty())
+					CpuLine.add(c);
+				else {
+					c.ReceiveUnProcessedData(dataBATCH_ForCPU.poll());
+				}
+			}
 		}
 	}
-	public void ReceiveDataFromGpu(Pair<DataBatch,Integer> dataBatchPair){
-		Pair<CPU, Queue<Pair<DataBatch,Integer>>> temp =CPUs.get(cpuRoundIndex.intValue());
-		synchronized(temp) {
-			temp.getSecond().add(dataBatchPair);
-			if (!temp.getSecond().isEmpty() & temp.getFirst().isReady())
-				temp.getFirst().ReceiveUnProcessedData(temp.getSecond().remove());
+
+	public synchronized void ReceiveDataFromGpu(Pair<DataBatch,Integer> dataBatchPair){
+		synchronized (CpuLine) {
+			synchronized (dataBATCH_ForCPU) {
+				if (CpuLine.isEmpty())
+					dataBATCH_ForCPU.add(dataBatchPair);
+				else
+					CpuLine.poll().ReceiveUnProcessedData(dataBatchPair);
+			}
 		}
-			int val;
-			do{
-				val=cpuRoundIndex.intValue()%CPUs.size();
-			}while(!cpuRoundIndex.compareAndSet(val,(val+1)%CPUs.size()));
 	}
 
 	public void finishTrainModel(String modelName){
@@ -74,8 +76,8 @@ public class Cluster {
 
 	public void AddCPUS(Vector<CPU> cpus){
 		for (CPU cpu:cpus) {
-			Pair pair = new Pair(cpu, new LinkedList<Pair<DataBatch,Integer>>());
-			CPUs.put(cpu.getId(),pair);
+			CPUs.put(cpu.getId(),cpu);
+			CpuLine.add(cpu);
 		}
 	}
 	public void AddGPUS(Vector<GPU> gpus){
