@@ -184,7 +184,7 @@ public class GPU {
      * @pre this.ready == false
      * @post this.countPDB > @pre(countPDB)
      */
-    public void ReceiveProcessedData(DataBatch databatch){
+    public synchronized void ReceiveProcessedData(DataBatch databatch){
         processingDataBatch.add(new Pair<DataBatch,Integer>(databatch,timeClock));
     }
 

@@ -168,6 +168,7 @@ public abstract class MicroService implements Runnable {
             }
 
         }
+        System.out.println("this microService stop running: "+this.getName());
         messageBus.unregister(this);
     }
 }

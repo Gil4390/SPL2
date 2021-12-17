@@ -1,5 +1,7 @@
 package bgu.spl.mics.application.objects;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Passive object representing a single CPU.
  * Add all the fields described in the assignment as private fields.
@@ -11,7 +13,7 @@ public class CPU {
     private Pair<DataBatch,Integer> databatchPair;
     private final Cluster cluster;
     private boolean ready;
-    private int processedTime;
+    private AtomicInteger processedTime;
     private int endProcessedTime;
 
     public CPU(int numOfCores, int id){
@@ -19,7 +21,7 @@ public class CPU {
         this.cluster=Cluster.getInstance();
         this.id = id;
         ready=true;
-        processedTime=0;
+        processedTime=new AtomicInteger(0);
     }
 
     /**
@@ -38,7 +40,7 @@ public class CPU {
         if(ready) {
             this.databatchPair = databatchPair;
             ready = false;
-            endProcessedTime = processedTime + (32 / cores) * databatchPair.getFirst().getProcessTime();
+            endProcessedTime = processedTime.intValue() + (32 / cores) * databatchPair.getFirst().getProcessTime();
         }
         else{
             System.out.println("entered function ReceiveUnProcessedData when cpu ready was false, CPUID: " + this.id);
@@ -54,14 +56,16 @@ public class CPU {
      * @post this.databatch == @pre(databatch) | @post(databatch) == null
      */
     public void tickAndCompute(){
-        processedTime++; // todo atomic
+        int val;
+        do{
+            val=processedTime.intValue();
+        }while(!processedTime.compareAndSet(val,val+1));
         if(!ready)
             cluster.getStatistics().AddCpu_TimeUsed();
-        if(!ready & processedTime==endProcessedTime){
+        if(!ready & processedTime.intValue()==endProcessedTime){
             endProcessedTime=0;
-            ready=true;
+            ready=true;//todo problem!!!
             cluster.ReceiveDataFromCpu(databatchPair, this.id);
-            //databatchPair=null;
         }
     }
 
@@ -80,7 +84,7 @@ public class CPU {
     /**
      * @return the processedTime, the amount of ticks that the cpu received
      */
-    public int getProcessedTime(){return processedTime;};
+    public int getProcessedTime(){return processedTime.intValue();};
 
     /**
      * @return the amount of tick that needed to process the databath
