@@ -46,7 +46,7 @@ public class TimeService extends MicroService {
 			} catch (InterruptedException e) {
 			}
 		}
-		sendBroadcast(new TerminateBroadcast()); // todo need to make this broadcast first in the queue
+		sendBroadcast(new TerminateBroadcast());
 		terminate();
 	}
 }

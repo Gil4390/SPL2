@@ -9,6 +9,8 @@ import bgu.spl.mics.application.objects.Model;
 import bgu.spl.mics.application.objects.Pair;
 import bgu.spl.mics.application.objects.Student;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Student is responsible for sending the {@link TrainModelEvent},
  * {@link TestModelEvent} and {@link PublishResultsEvent}.
@@ -22,32 +24,33 @@ public class StudentService extends MicroService {
 
     private Student student;
     Thread thread;
+    private boolean terminated;
 
     public StudentService(Student student) {
         super("Student - " + student.getId() + " Service");
         this.student = student;
         thread = new Thread( ()->activateModels());
+        terminated=false;
     }
 
     @Override
     protected void initialize() {
         subscribeBroadcast(PublishConferenceBroadcast.class, this::PublishConferenceBroadcast);
-        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{terminate();});
+        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{terminated=true; terminate();});
         act();
     }
 
     public void act() {
-        Thread thread = new Thread( ()->activateModels());
         thread.start();
     }
 
     public void activateModels(){
         for (Model m : this.student.getModels()) {
             Model model = TrainModel(m);
-            if(model!=null){
+            if(model!=null & !terminated){
                 this.student.getTrainedModels().add(model);
                 try {
-                    if (TestModel(model)) {
+                    if (!terminated && TestModel(model)) {
                         PublishResults(model);
                     }
                 }
@@ -66,7 +69,10 @@ public class StudentService extends MicroService {
         if(model != null) {
             System.out.println("student id:" + student.getId() + ", send TrainModel event with model name:" + model.getName());
             TrainModelEvent trainEvent = new TrainModelEvent(this.student.getId(), model);
-            return sendEvent(trainEvent).get();
+            Model returnModel =null;
+            while(returnModel==null & !terminated)
+                returnModel= sendEvent(trainEvent).get(100, TimeUnit.MILLISECONDS);
+            return returnModel;
         }
         System.out.println("Model return null for this micro service: "+getName() + "in methode: TrainModel");
         return null;

@@ -10,7 +10,6 @@ import bgu.spl.mics.application.objects.Model;
 import bgu.spl.mics.application.objects.Pair;
 
 import java.util.LinkedList;
-import java.util.PriorityQueue;
 import java.util.Queue;
 
 /**
@@ -43,10 +42,12 @@ public class GPUService extends MicroService {
         subscribeEvent(TrainModelEvent.class, (TrainModelEvent)->{TrainModelEvent(TrainModelEvent);});
         subscribeEvent(TestModelEvent.class, (TestModelEvent)->{TestModel(TestModelEvent);});
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast)->{tick();});
-        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{completeTerminate() ;terminate();});
+        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{completeTerminate() ;});
     }
 
-    private void completeTerminate(){
+    private synchronized void completeTerminate(){
+        System.out.println("this gpu is terminate: "+gpu.getId());
+        terminate();
         complete(currentEvent,null);
         for (Pair<TrainModelEvent, Integer> pair:TrainModelEventQueue) {
             complete(pair.getFirst(),null);
@@ -96,14 +97,26 @@ public class GPUService extends MicroService {
     }
 
     public void nextEvent(){
-        if(TrainModelEventQueue.isEmpty() && !TestModelEventQueue.isEmpty())
-            TestModel(TestModelEventQueue.poll().getFirst());
-        else if(!TrainModelEventQueue.isEmpty() && TestModelEventQueue.isEmpty())
-            TrainModelEvent(TrainModelEventQueue.poll().getFirst());
-        else if(!TrainModelEventQueue.isEmpty() && (TrainModelEventQueue.peek().getSecond() <= TestModelEventQueue.peek().getSecond()))
-            TrainModelEvent(TrainModelEventQueue.poll().getFirst());
-        else if(!TestModelEventQueue.isEmpty())
-            TestModel(TestModelEventQueue.poll().getFirst());
+        if(TrainModelEventQueue.isEmpty() && !TestModelEventQueue.isEmpty()) {
+            TestModelEvent event =TestModelEventQueue.poll().getFirst();
+            currentEvent = event;
+            TestModel(event);
+        }
+        else if(!TrainModelEventQueue.isEmpty() && TestModelEventQueue.isEmpty()) {
+            TrainModelEvent event =TrainModelEventQueue.poll().getFirst();
+            currentEvent = event;
+            TrainModelEvent(event);
+        }
+        else if(!TrainModelEventQueue.isEmpty() && (TrainModelEventQueue.peek().getSecond() <= TestModelEventQueue.peek().getSecond())) {
+            TrainModelEvent event =TrainModelEventQueue.poll().getFirst();
+            currentEvent = event;
+            TrainModelEvent(event);
+        }
+        else if(!TestModelEventQueue.isEmpty()) {
+            TestModelEvent event =TestModelEventQueue.poll().getFirst();
+            currentEvent = event;
+            TestModel(event);
+        }
     }
 
     public GPU getGpu() {

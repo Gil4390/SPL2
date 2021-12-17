@@ -40,7 +40,7 @@
 
 }
 ],
-"GPUS": ["RTX3090","RTX2080"],
+"GPUS": ["RTX3090"],
 "CPUS": [32,16,8],
 "Conferences":
 [
@@ -48,5 +48,5 @@
 {"name": "ICML2", "date": 400}
 ],
 "TickTime": 5,
-"Duration": 800
+"Duration": 100
 }
