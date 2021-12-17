@@ -195,6 +195,7 @@ public class CRMSRunner {
         for(int i = 0; i < conferences.size(); i++){
             ConfrenceInformation c = conferences.elementAt(i);
             OutModel[] models = new OutModel[c.getSuccessfulModels().size()];
+            boolean isnull = true;
             int j = 0;
             for(Pair<String, Integer> p : c.getSuccessfulModels()){
                 for (Student student : students){
@@ -204,11 +205,15 @@ public class CRMSRunner {
                                 Data data = s_model.getData();
                                 OutData outdata = new OutData(data.getTypeString(), data.getSize());
                                 models[j] = new OutModel(s_model.getName(), outdata, s_model.getStatusString(), s_model.getResultString());
+                                isnull = false;
                             }
                         }
                     }
                 }
                 j++;
+            }
+            if(isnull){
+                models = new OutModel[0];
             }
             outConferences[i] = new OutConference(c.getName(), c.getDate(), models);
         }
