@@ -83,7 +83,6 @@ public class GPU {
             TrainModel();
             SendDataBatch();
             cluster.getStatistics().AddGpu_TimeUsed();
-
             if (unProcessedDataBatch!=null && countPDB == unProcessedDataBatch.length & countPDB != 0) {
                 cluster.finishTrainModel(model.getName());
                 finishTrainModel = true;
@@ -206,18 +205,6 @@ public class GPU {
         }
     }
 
-
-//    /**
-//     * this function store the model the gpu needs to train
-//     * <p>
-//     * @param model the model the gpu needs to train
-//     * @pre this.model == null
-//     * @post this.model == model
-//     */
-//    public void setModel(Model model){
-//        this.model = model;
-//    }
-
     public Type getType() {
         return type;
     }
@@ -245,10 +232,6 @@ public class GPU {
     public synchronized boolean isReady() {
         return ready;
     }
-
-//    public void setReady(boolean ready) {
-//        this.ready = ready;
-//    }
 
     public Model getModel() {
         return model;
