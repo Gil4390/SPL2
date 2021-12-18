@@ -99,10 +99,10 @@ public class Student {
      * @param type the type
      */
     private Student.Degree FromStringToType(String type){
-        switch (type) {
-            case ("MSc"):
+        switch (type.toLowerCase()) {
+            case ("msc"):
                 return Student.Degree.MSc;
-            case ("PhD"):
+            case ("phd"):
                 return Student.Degree.PhD;
             default:
                 return null;
