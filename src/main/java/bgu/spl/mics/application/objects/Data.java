@@ -12,9 +12,9 @@ public class Data {
         Images, Text, Tabular
     }
 
-    private Type type;
-    private int processed;
-    private int size;
+    private final Type type;
+    private final int processed;
+    private final int size;
 
     public Data(String type, int size){
         this.type = FromStringToType(type);
@@ -50,10 +50,6 @@ public class Data {
 
     public String getTypeString(){
         return type.toString();
-    }
-
-    public int getProcessed() {
-        return processed;
     }
 
     public int getSize() {

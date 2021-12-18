@@ -4,10 +4,10 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Statistics {
-    private Stack<String> modelNames;
-    private AtomicInteger gpu_TimeUsed;
-    private AtomicInteger cpu_TimeUsed;
-    private AtomicInteger numberOfDataBatchProcessedByCpu;
+    private final Stack<String> modelNames;
+    private final AtomicInteger gpu_TimeUsed;
+    private final AtomicInteger cpu_TimeUsed;
+    private final AtomicInteger numberOfDataBatchProcessedByCpu;
 
     public Statistics(){
         modelNames = new Stack<String>();

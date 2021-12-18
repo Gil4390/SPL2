@@ -13,7 +13,7 @@ public class CPU {
     private Pair<DataBatch,Integer> databatchPair;
     private final Cluster cluster;
     private boolean ready;
-    private AtomicInteger processedTime;
+    private final AtomicInteger processedTime;
     private int endProcessedTime;
 
     public CPU(int numOfCores, int id){
@@ -36,10 +36,9 @@ public class CPU {
      * @post ths.ready = false;
      */
     public synchronized void ReceiveUnProcessedData(Pair<DataBatch,Integer> databatchPair){
-        //System.out.println("received from Gpu, id:" + databatchPair.getSecond());
         if(ready) {
-            this.databatchPair = databatchPair;
             ready = false;
+            this.databatchPair = databatchPair;
             endProcessedTime = processedTime.intValue() + (32 / cores) * databatchPair.getFirst().getProcessTime();
         }
         else{
@@ -64,7 +63,7 @@ public class CPU {
             cluster.getStatistics().AddCpu_TimeUsed();
         if(!ready & processedTime.intValue()==endProcessedTime){
             endProcessedTime=0;
-            ready=true;//todo problem!!!
+            ready=true;
             cluster.ReceiveDataFromCpu(databatchPair, this.id);
         }
     }

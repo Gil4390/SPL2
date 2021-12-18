@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.services;
 
+import bgu.spl.mics.Future;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.*;
 import bgu.spl.mics.application.objects.Model;
@@ -17,68 +18,47 @@ import bgu.spl.mics.application.objects.Student;
  */
 public class StudentService extends MicroService {
 
-    private Student student;
-    private int modelSendCount;
+    private final Student student;
+
     public StudentService(Student student) {
         super("Student - " + student.getId() + " Service");
         this.student = student;
-        modelSendCount=-1;
+        terminate=false;
     }
-
+    boolean terminate;
     @Override
     protected void initialize() {
         subscribeBroadcast(PublishConferenceBroadcast.class, this::PublishConferenceBroadcast);
-        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{terminate();});
-        subscribeBroadcast(TrainedBroadcast.class, (TrainedBroadcast)-> sendToTest(TrainedBroadcast.getModel()));
-        subscribeBroadcast(TestedBroadcast.class, (TestedBroadcast)-> sendToPublish(TestedBroadcast.getModel()));
+        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{terminate=true; terminate();});
         act();
     }
 
-    public void act() {
-        modelSendCount++;
-        if(this.student.getModels().size() > modelSendCount) {
-            Model m = this.student.getModels().get(modelSendCount);
-            TrainModelEvent trainEvent = new TrainModelEvent(this.student.getId(), m);
-            System.out.println("student id:" + student.getId() + ", send TrainModelEvent with model name:" + m.getName());
-            sendEvent(trainEvent);
+    public void act(){
+        for (Model model:student.getModels()) {
+            TrainModelEvent trainEvent = new TrainModelEvent(this.student.getId(), model);
+            System.out.println("student id:"+ student.getId()+" ,sent the model: "+model.getName()+" to train");
+            trainEvent.setFuture(sendEvent(trainEvent));
+            model =trainEvent.getFuture().get();
+            if(model != null ) {
+                student.getTrainedModels().add(model);
+                TestModelEvent testEvent = new TestModelEvent(this.student.getId(), model);
+                System.out.println("student id:"+ student.getId()+" ,sent the model: "+model.getName()+" to test");
+                Future<Boolean> f = sendEvent(testEvent);
+                if(f.get() != null) {
+                    if (testEvent.getFuture().get()) {
+                        PublishResultsEvent publishEvent = new PublishResultsEvent(this.student.getId(), model.getName());
+                        sendEvent(publishEvent);
+                    }
+                }
+                else
+                    break;
+            }
+            else
+                break;
         }
-    }
-
-    private boolean checkIfMyModel(Model m)
-    {
-        //System.out.println("Model " + m.getName() + " in " + student.getId() + " : " + student.getModels().contains(m));
-        return student.getModels().contains(m);
-    }
-
-    private void sendToTest(Model model){
-        if(checkIfMyModel(model)){
-            student.getTrainedModels().add(model);
-            System.out.println("student id:" + student.getId() + ", sentToTest with model name:" + model.getName());
-            TestModelEvent testEvent = new TestModelEvent(this.student.getId(), model);
-            sendEvent(testEvent);
-        }
-    }
-
-    private void sendToPublish(Model model){
-        if(checkIfMyModel(model)) {
-            act();
-            if(model.getResultString()=="Good")
-                PublishResults(model);
-        }
-    }
-
-    private void PublishResults(Model model){
-        if(model != null){
-            System.out.println("student id:" + student.getId() + ", send PublishResults event with model name:" + model.getName());
-            PublishResultsEvent publishEvent = new PublishResultsEvent(this.student.getId(), model.getName());
-            sendEvent(publishEvent);
-        }
-        else
-            System.out.println("Model return null for this micro service: "+getName() + "in methode: PublishResults");
     }
 
     private void PublishConferenceBroadcast(PublishConferenceBroadcast event){
-        //System.out.println("the student id: " + student.getId() +",got an PublishConferenceBroadcast");
         for (Pair<String,Integer> pair:event.getModels()) {
             if(student.getId()==pair.getSecond())
                 student.setPublications(student.getPublications()+1, pair.getFirst());

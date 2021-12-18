@@ -10,9 +10,9 @@ import java.util.Queue;
  */
 public class ConfrenceInformation {
 
-    private String name;
-    private int date;
-    private Queue<Pair<String,Integer>> successfulModels;
+    private final String name;
+    private final int date;
+    private final Queue<Pair<String,Integer>> successfulModels;
 
     public ConfrenceInformation(String name, int date) {
         this.successfulModels = new LinkedList<>();

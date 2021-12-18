@@ -17,7 +17,7 @@ import bgu.spl.mics.application.objects.Pair;
  */
 public class ConferenceService extends MicroService {
 
-    private ConfrenceInformation conf;
+    private final ConfrenceInformation conf;
     int date;
 
     public ConferenceService(ConfrenceInformation conf) {

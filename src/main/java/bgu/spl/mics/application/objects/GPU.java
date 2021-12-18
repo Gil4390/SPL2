@@ -18,13 +18,13 @@ public class GPU {
      */
     enum Type {RTX3090, RTX2080, GTX1080}
 
-    private Type type;
+    private final Type type;
 
     private final int id;
     private Model model;
-    private Cluster cluster;
+    private final Cluster cluster;
 
-    private Queue<Pair<DataBatch,Integer>> processingDataBatch;
+    private final Queue<Pair<DataBatch,Integer>> processingDataBatch;
 
     private DataBatch[] unProcessedDataBatch;
 
@@ -63,7 +63,7 @@ public class GPU {
      * @post this.timeClock == @pre(this.timeClock)+1
      */
     public void tick(){
-        timeClock++;//todo atomic
+        timeClock++;
         if(!ready) {
             cluster.getStatistics().AddGpu_TimeUsed();
             TrainModel();
@@ -169,7 +169,6 @@ public class GPU {
     private void SendDataBatch(){
         int counter = 0;
         while(counter < (capacity- processingDataBatch.size()) && indexUPDB<unProcessedDataBatch.length) {
-            //System.out.println("sent from GPU, id:" + id);
             Pair tempPair = new  <DataBatch,Integer> Pair(unProcessedDataBatch[indexUPDB],id);
             cluster.ReceiveDataFromGpu(tempPair);
             indexUPDB++;
@@ -212,40 +211,12 @@ public class GPU {
         return type;
     }
 
-    public int getIndexUPDB() {
-        return indexUPDB;
-    }
-
-    public int getCountPDB() {
-        return countPDB;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public int getTimeClock() {
-        return timeClock;
-    }
-
-    public int getTrainingTime() {
-        return trainingTime;
-    }
-
     public synchronized boolean isReady() {
         return ready;
     }
 
     public Model getModel() {
         return model;
-    }
-
-    public Queue<Pair<DataBatch,Integer>> getProcessingDataBatch() {
-        return processingDataBatch;
-    }
-
-    public DataBatch[] getUnProcessedDataBatch() {
-        return unProcessedDataBatch;
     }
 
     public int getId() {

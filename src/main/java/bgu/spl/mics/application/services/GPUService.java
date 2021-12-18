@@ -19,9 +19,9 @@ import java.util.Queue;
  */
 public class GPUService extends MicroService {
 
-    private GPU gpu;
-    private Queue<Pair<TrainModelEvent,Integer>> TrainModelEventQueue;
-    private Queue<Pair<TestModelEvent,Integer>> TestModelEventQueue;
+    private final GPU gpu;
+    private final Queue<Pair<TrainModelEvent,Integer>> TrainModelEventQueue;
+    private final Queue<Pair<TestModelEvent,Integer>> TestModelEventQueue;
     int clock;
     private Event currentEvent;
 
@@ -39,7 +39,19 @@ public class GPUService extends MicroService {
         subscribeEvent(TrainModelEvent.class, (TrainModelEvent)->{TrainModelEvent(TrainModelEvent);});
         subscribeEvent(TestModelEvent.class, (TestModelEvent)->{TestModel(TestModelEvent);});
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast)->{tick();});
-        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->terminate());
+        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{closeProcess();terminate();});
+    }
+
+    private void closeProcess(){
+        for (Pair<TrainModelEvent ,Integer> pair:TrainModelEventQueue) {
+            TrainModelEvent event = pair.getFirst();
+            complete(event, null);
+        }
+        for (Pair<TestModelEvent ,Integer> pair:TestModelEventQueue) {
+            TestModelEvent event = pair.getFirst();
+            complete(event, null);
+        }
+        complete(currentEvent,null);
     }
 
     private void tick(){
@@ -47,9 +59,10 @@ public class GPUService extends MicroService {
         gpu.tick();
         if(gpu.isReady()) {
             if(gpu.isFinishTrainModel()) {
-                TrainedBroadcast event = new TrainedBroadcast(gpu.getModel());
+                //TrainedBroadcast event = new TrainedBroadcast(gpu.getModel());
                 gpu.setFinishTrainModel(false);
-                sendBroadcast(event);
+                complete(currentEvent,gpu.getModel());
+                //sendBroadcast(event);
             }
             nextEvent();
         }
@@ -75,8 +88,9 @@ public class GPUService extends MicroService {
             currentEvent=event;
             gpu.TestModel(event.getModel());
             System.out.println("TestModelEvent, from GPU:"+ gpu.getId()+"  , the test from model name:"+event.getModel().getName()+" , test result:"+event.getModel().getResultString());
-            TestedBroadcast testedModel = new TestedBroadcast(gpu.getModel());
-            sendBroadcast(testedModel);
+            //TestedBroadcast testedModel = new TestedBroadcast(gpu.getModel());
+            //sendBroadcast(testedModel);
+            complete(currentEvent,gpu.getModel().getResultString() == "Good");
             nextEvent();
         }
     }

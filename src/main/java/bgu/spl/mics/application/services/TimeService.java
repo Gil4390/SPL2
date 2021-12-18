@@ -20,8 +20,8 @@ import java.util.Timer;
 public class TimeService extends MicroService {
 
 	private int TickCount;
-	private long speed;
-	private int duration;
+	private final long speed;
+	private final int duration;
 
 	public TimeService(int speed, int duration) {
 		super("TimeService");
@@ -38,7 +38,6 @@ public class TimeService extends MicroService {
 	private void act() {
 		TickBroadcast tickBroadcast = new TickBroadcast();
 		while (TickCount < duration) {
-			//System.out.println("tick ======================================================== " + TickCount); //todo remove
 			sendBroadcast(tickBroadcast);
 			TickCount++;
 			try {

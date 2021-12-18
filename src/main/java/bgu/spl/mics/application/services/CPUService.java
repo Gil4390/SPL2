@@ -16,7 +16,7 @@ import bgu.spl.mics.application.objects.CPU;
  */
 public class CPUService extends MicroService {
 
-    private CPU cpu;
+    private final CPU cpu;
 
     public CPUService(CPU cpu) {
         super("CPU - " + (cpu.getId()) + " Service");

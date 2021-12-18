@@ -22,13 +22,13 @@ public class Student {
 
     private final int id;
     private String name;
-    private String department;
-    private Degree status;
+    private final String department;
+    private final Degree status;
     private int publications;
     private int papersRead;
 
-    private Vector <Model> models;
-    private LinkedList<Model> TrainedModels;
+    private final Vector <Model> models;
+    private final LinkedList<Model> TrainedModels;
 
     public Student(String name, String department, String degree, int id){
         this.name = name;

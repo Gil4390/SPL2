@@ -9,7 +9,7 @@ public class Model {
     private String name;
     private Data data;
 
-    private double TestProbability;
+    private final double TestProbability;
 
     enum Status {PreTrained, Training, Trained,Tested}
     private Status status;

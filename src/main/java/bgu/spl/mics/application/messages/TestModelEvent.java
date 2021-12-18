@@ -25,10 +25,6 @@ public class TestModelEvent implements Event<Boolean> {
         return future;
     }
 
-    public int getSenderID() {
-        return senderID;
-    }
-
     public Model getModel() {
         return model;
     }

@@ -24,10 +24,10 @@ import java.util.Stack;
  * <p>
  */
 public abstract class MicroService implements Runnable {
-    private HashMap<Class<? extends Message>, Callback> callbackMap;
+    private final HashMap<Class<? extends Message>, Callback> callbackMap;
     private boolean terminated = false;
     private final String name;
-    private MessageBusImpl messageBus;
+    private final MessageBusImpl messageBus;
 
     /**
      * @param name the micro-service name (used mainly for debugging purposes -

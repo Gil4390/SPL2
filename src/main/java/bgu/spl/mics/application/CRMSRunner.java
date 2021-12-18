@@ -31,7 +31,7 @@ public class CRMSRunner {
         String Duration = "";
 
         MessageBusImpl messageBus = MessageBusImpl.getInstance();
-        //todo valid input?
+
         try {
             Gson gson = new Gson();
             Reader reader = Files.newBufferedReader(Paths.get("simple.json"));

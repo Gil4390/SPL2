@@ -16,14 +16,14 @@ import java.util.concurrent.locks.ReadWriteLock;
 public class Cluster {
 
 
-	private HashMap<Integer,CPU> CPUs;
-	private HashMap<Integer,GPU> GPUs;
+	private final HashMap<Integer,CPU> CPUs;
+	private final HashMap<Integer,GPU> GPUs;
 
-	private Queue<Pair<DataBatch,Integer>> dataBATCH_ForCPU;
-	private Queue <CPU> CpuLine;
-	private Statistics statistics;
+	private final Queue<Pair<DataBatch,Integer>> dataBATCH_ForCPU;
+	private final Queue <CPU> CpuLine;
+	private final Statistics statistics;
 
-	private Cluster(){//todo maby do a line of databatch and for evey cpu that get free he will poll from this line
+	private Cluster(){
 		statistics= new Statistics();
 		CPUs = new HashMap<>();
 		GPUs = new HashMap<>();
@@ -45,7 +45,6 @@ public class Cluster {
 	public void ReceiveDataFromCpu(Pair<DataBatch,Integer> dataBatchPair, int cpuID){
 		GPU tempGPU= GPUs.get(dataBatchPair.getSecond());
 		statistics.AddNumberOfDataBatchProcessedByCpu();
-		//System.out.println("received from CPU, id:" + cpuID);
 		tempGPU.ReceiveProcessedData(dataBatchPair.getFirst());
 		CPU c = CPUs.get(cpuID);
 		synchronized (CpuLine) {

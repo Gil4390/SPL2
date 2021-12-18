@@ -7,8 +7,7 @@ package bgu.spl.mics.application.objects;
 
 public class DataBatch {
     private int processTime;
-    private int startTick; //TODO check if ned to remove
-    private int start_index;
+    private final int start_index;
     Data data;
 
     public DataBatch(int index,Data data) {
@@ -21,13 +20,5 @@ public class DataBatch {
 
     public int getProcessTime(){
         return processTime;
-    }
-
-    public int getStartTick() {
-        return startTick;
-    }
-
-    public void setStartTick(int startTick) {
-        this.startTick = startTick;
     }
 }
