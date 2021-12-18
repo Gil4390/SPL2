@@ -67,7 +67,6 @@ public class StudentService extends MicroService {
         }
     }
 
-
     private void PublishResults(Model model){
         if(model != null){
             System.out.println("student id:" + student.getId() + ", send PublishResults event with model name:" + model.getName());

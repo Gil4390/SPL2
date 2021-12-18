@@ -80,8 +80,8 @@ public class Future<T> {
 			return result;
 		else{
 			try{
-				//unit.wait(timeout); //TODO check if time works
-				wait(timeout);
+				unit.sleep(timeout); //TODO check if time works
+				//wait(timeout);
 			}
 			catch (InterruptedException e){}
 		}

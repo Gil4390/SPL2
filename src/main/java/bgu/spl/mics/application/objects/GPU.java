@@ -34,10 +34,6 @@ public class GPU {
     private int timeClock;
     private int trainingTime;
 
-    public void setFinishTrainModel(boolean finishTrainModel) {
-        this.finishTrainModel = finishTrainModel;
-    }
-
     private boolean finishTrainModel;
     private boolean ready;
 
