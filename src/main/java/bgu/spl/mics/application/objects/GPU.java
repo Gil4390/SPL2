@@ -110,9 +110,11 @@ public class GPU {
      * @post countPDB >= @pre(countPDB)
      */
     private void TrainModel(){
-        while(!processingDataBatch.isEmpty() && processingDataBatch.peek().getSecond()+trainingTime<=timeClock) {
-            processingDataBatch.poll();
-            countPDB++;
+        synchronized (processingDataBatch) {
+            while (!processingDataBatch.isEmpty() && processingDataBatch.peek().getSecond() + trainingTime <= timeClock) {
+                processingDataBatch.poll();
+                countPDB++;
+            }
         }
     }
 
@@ -182,8 +184,10 @@ public class GPU {
      * @pre this.ready == false
      * @post this.countPDB > @pre(countPDB)
      */
-    public synchronized void ReceiveProcessedData(DataBatch databatch){
-        processingDataBatch.add(new Pair<DataBatch,Integer>(databatch,timeClock));
+    public void ReceiveProcessedData(DataBatch databatch){
+        synchronized (processingDataBatch) {
+            processingDataBatch.add(new Pair<DataBatch, Integer>(databatch, timeClock));
+        }
     }
 
     /**

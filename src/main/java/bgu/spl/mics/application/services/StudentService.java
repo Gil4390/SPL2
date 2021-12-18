@@ -46,7 +46,7 @@ public class StudentService extends MicroService {
 
     private boolean checkIfMyModel(Model m)
     {
-        System.out.println("Model " + m.getName() + " in " + student.getId() + " : " + student.getModels().contains(m));
+        //System.out.println("Model " + m.getName() + " in " + student.getId() + " : " + student.getModels().contains(m));
         return student.getModels().contains(m);
     }
 
@@ -78,7 +78,7 @@ public class StudentService extends MicroService {
     }
 
     private void PublishConferenceBroadcast(PublishConferenceBroadcast event){
-        System.out.println("the student id: " + student.getId() +",got an PublishConferenceBroadcast");
+        //System.out.println("the student id: " + student.getId() +",got an PublishConferenceBroadcast");
         for (Pair<String,Integer> pair:event.getModels()) {
             if(student.getId()==pair.getSecond())
                 student.setPublications(student.getPublications()+1, pair.getFirst());
