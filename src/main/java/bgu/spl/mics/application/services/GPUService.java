@@ -1,10 +1,7 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.*;
-import bgu.spl.mics.application.messages.TerminateBroadcast;
-import bgu.spl.mics.application.messages.TestModelEvent;
-import bgu.spl.mics.application.messages.TickBroadcast;
-import bgu.spl.mics.application.messages.TrainModelEvent;
+import bgu.spl.mics.application.messages.*;
 import bgu.spl.mics.application.objects.GPU;
 import bgu.spl.mics.application.objects.Model;
 import bgu.spl.mics.application.objects.Pair;
@@ -42,27 +39,17 @@ public class GPUService extends MicroService {
         subscribeEvent(TrainModelEvent.class, (TrainModelEvent)->{TrainModelEvent(TrainModelEvent);});
         subscribeEvent(TestModelEvent.class, (TestModelEvent)->{TestModel(TestModelEvent);});
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast)->{tick();});
-        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{completeTerminate() ;});
-    }
-
-    private synchronized void completeTerminate(){
-        System.out.println("this gpu is terminate: "+gpu.getId());
-        terminate();
-        complete(currentEvent,null);
-        for (Pair<TrainModelEvent, Integer> pair:TrainModelEventQueue) {
-            complete(pair.getFirst(),null);
-        }
-        for (Pair<TestModelEvent, Integer> pair:TestModelEventQueue) {
-            complete(pair.getFirst(),null);
-        }
+        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->terminate());
     }
 
     private void tick(){
         clock++;
         gpu.tick();
         if(gpu.isReady()) {
-            if(gpu.isFinishTrainModel())
-                complete(currentEvent,gpu.getModel());
+            if(gpu.isFinishTrainModel()) {
+                TrainedBroadcast event = new TrainedBroadcast(gpu.getModel());
+                sendBroadcast(event);
+            }
             nextEvent();
         }
     }
@@ -87,11 +74,8 @@ public class GPUService extends MicroService {
             currentEvent=event;
             gpu.TestModel(event.getModel());
             System.out.println("TestModelEvent, from GPU:"+ gpu.getId()+"  , the test from model name:"+event.getModel().getName()+" , test result:"+event.getModel().getResultString());
-            if(event.getModel().getResultString() == "Good")
-                complete(event,true);
-            else{
-                complete(event,false);
-            }
+            TestedBroadcast testedModel = new TestedBroadcast(gpu.getModel());
+            sendBroadcast(testedModel);
             nextEvent();
         }
     }

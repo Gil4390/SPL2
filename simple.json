@@ -44,9 +44,9 @@
 "CPUS": [32,16,8],
 "Conferences":
 [
-{"name": "ICML", "date": 50},
-{"name": "ICML2", "date": 90}
+{"name": "ICML", "date": 100},
+{"name": "ICML2", "date": 130}
 ],
 "TickTime": 10,
-"Duration": 100
+"Duration": 200
 }

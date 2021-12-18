@@ -57,21 +57,6 @@ public class GPU {
         finishTrainModel=false;
     }
 
-    public void TestModel(Model m){
-        ready = false;
-        finishTrainModel=false;
-        this.model = m;
-        Random rnd = new Random();
-        if(rnd.nextDouble() < m.getTestProbability()){
-            this.model.setResultString("Good");
-        }
-        else{
-            this.model.setResultString("Bad");
-        }
-        model.setStatusString("Tested");
-        Finish();
-    }
-
     /**
      * represent a tick for the cpu.
      * <p>
@@ -100,6 +85,20 @@ public class GPU {
         DivideDataBatch();
     }
 
+    public void TestModel(Model m){
+        ready = false;
+        finishTrainModel=false;
+        this.model = m;
+        Random rnd = new Random();
+        if(rnd.nextDouble() < m.getTestProbability()){
+            this.model.setResultString("Good");
+        }
+        else{
+            this.model.setResultString("Bad");
+        }
+        model.setStatusString("Tested");
+        Finish();
+    }
 
 
     /**

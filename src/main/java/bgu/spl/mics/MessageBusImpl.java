@@ -32,6 +32,8 @@ public class MessageBusImpl implements MessageBus {
 		this.Broadcast_subscribe.put(TickBroadcast.class, new LinkedList<>());
 		this.Broadcast_subscribe.put(TerminateBroadcast.class, new LinkedList<>());
 		this.Broadcast_subscribe.put(PublishConferenceBroadcast.class, new LinkedList<>());
+		this.Broadcast_subscribe.put(TrainedBroadcast.class, new LinkedList<>());
+		this.Broadcast_subscribe.put(TestedBroadcast.class, new LinkedList<>());
 
 		this.event_subscribe.put(TrainModelEvent.class, new LinkedList<>());
 		this.event_subscribe.put(TestModelEvent.class, new LinkedList<>());

@@ -6,6 +6,7 @@ import bgu.spl.mics.application.services.StudentService;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Vector;
 
 /**
  * Passive object representing single student.
@@ -26,7 +27,7 @@ public class Student {
     private int publications;
     private int papersRead;
 
-    private Queue<Model> models;
+    private Vector <Model> models;
     private LinkedList<Model> TrainedModels;
 
     public Student(String name, String department, String degree, int id){
@@ -35,7 +36,7 @@ public class Student {
         this.status = FromStringToType(degree);
         publications = 0;
         papersRead = 0;
-        this.models = new LinkedList<>();
+        this.models = new Vector<>();
         this.TrainedModels =new <Model> LinkedList ();
         this.id = id;
     }
@@ -84,7 +85,7 @@ public class Student {
         return id;
     }
 
-    public Queue<Model> getModels() {
+    public Vector<Model> getModels() {
         return models;
     }
 

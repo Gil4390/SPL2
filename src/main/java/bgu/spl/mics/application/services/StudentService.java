@@ -9,6 +9,7 @@ import bgu.spl.mics.application.objects.Model;
 import bgu.spl.mics.application.objects.Pair;
 import bgu.spl.mics.application.objects.Student;
 
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,72 +24,54 @@ import java.util.concurrent.TimeUnit;
 public class StudentService extends MicroService {
 
     private Student student;
-    Thread thread;
-    private boolean terminated;
-
+    private int modelSendCount;
     public StudentService(Student student) {
         super("Student - " + student.getId() + " Service");
         this.student = student;
-        thread = new Thread( ()->activateModels());
-        terminated=false;
+        modelSendCount=-1;
     }
 
     @Override
     protected void initialize() {
         subscribeBroadcast(PublishConferenceBroadcast.class, this::PublishConferenceBroadcast);
-        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{terminated=true; terminate();});
+        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{terminate();});
+        subscribeBroadcast(TrainedBroadcast.class, (TrainedBroadcast)->sentToTest(TrainedBroadcast.getModel()));
+        subscribeBroadcast(TestedBroadcast.class, (TestedBroadcast)->sentToPublish(TestedBroadcast.getModel()));
         act();
     }
 
     public void act() {
-        thread.start();
-    }
-
-    public void activateModels(){
-        for (Model m : this.student.getModels()) {
-            Model model = TrainModel(m);
-            if(model!=null & !terminated){
-                this.student.getTrainedModels().add(model);
-                try {
-                    if (!terminated && TestModel(model)) {
-                        PublishResults(model);
-                    }
-                }
-                catch (NullPointerException e){
-                    System.out.println("Model return null for this micro service: "+getName() + "in methode: activateModels");
-                };
-                System.out.println("student: " + student.getId() + ", model:" + m.getName() + ", was tested and return the result: " + model.getResultString());
-            }
-            else{
-                System.out.println("Model return null for this micro service: "+getName() + " in methode: activateModels");
-            }
+        modelSendCount++;
+        if(this.student.getModels().size() > modelSendCount) {
+            Model m = this.student.getModels().get(modelSendCount);
+            TrainModelEvent trainEvent = new TrainModelEvent(this.student.getId(), m);
+            System.out.println("student id:" + student.getId() + ", send TrainModelEvent with model name:" + m.getName());
+            sendEvent(trainEvent);
         }
     }
 
-    public Model TrainModel(Model model){
-        if(model != null) {
-            System.out.println("student id:" + student.getId() + ", send TrainModel event with model name:" + model.getName());
-            TrainModelEvent trainEvent = new TrainModelEvent(this.student.getId(), model);
-            Model returnModel =null;
-            while(returnModel==null & !terminated)
-                returnModel= sendEvent(trainEvent).get(100, TimeUnit.MILLISECONDS);
-            return returnModel;
-        }
-        System.out.println("Model return null for this micro service: "+getName() + "in methode: TrainModel");
-        return null;
+    private boolean checkIfMyModel(Model m)
+    {
+        return student.getModels().contains(m);
     }
 
-    public Boolean TestModel(Model model){
-        if(model != null){
-            System.out.println("student id:"+student.getId()+", send TestModel event with model name:"+model.getName());
+    private void sentToTest(Model model){
+        if(checkIfMyModel(model)){
+            student.getTrainedModels().add(model);
+            System.out.println("student id:" + student.getId() + ", sentToTest with model name:" + model.getName());
             TestModelEvent testEvent = new TestModelEvent(this.student.getId(), model);
-            return sendEvent(testEvent).get();
+            sendEvent(testEvent);
         }
-        System.out.println("Model return null for this micro service: "+getName() + "in methode: TestModel");
-        return false;
     }
 
-    public void PublishResults(Model model){
+    private void sentToPublish(Model model){
+        if(checkIfMyModel(model) && model.getResultString()=="Good") {
+            act();
+            PublishResults(model);
+        }
+    }
+
+    private void PublishResults(Model model){
         if(model != null){
             System.out.println("student id:" + student.getId() + ", send PublishResults event with model name:" + model.getName());
             PublishResultsEvent publishEvent = new PublishResultsEvent(this.student.getId(), model.getName());
