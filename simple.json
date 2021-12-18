@@ -11,12 +11,12 @@
 {
 "name": "YOLO10",
 "type": "images",
-"size": 3000
+"size": 30000
 },
 {
 "name": "ResNet9000",
 "type": "images",
-"size": 4000
+"size": 40000
 }
 ]
 },
@@ -29,24 +29,24 @@
 {
 "name": "YOLO9000",
 "type": "images",
-"size": 16000
+"size": 30000
 },
 {
 "name": "VIT2",
 "type": "images",
-"size": 3000
+"size": 30000
 }
 ]
 
 }
 ],
 "GPUS": ["RTX3090","GTX1080", "RTX2080","RTX3090","GTX1080"],
-"CPUS": [32,16,8],
+"CPUS": [32,16],
 "Conferences":
 [
-{"name": "ICML", "date": 100},
-{"name": "ICML2", "date": 130}
+{"name": "ICML", "date": 400},
+{"name": "ICML2", "date": 400}
 ],
-"TickTime": 10,
-"Duration": 200
+"TickTime": 1,
+"Duration": 500
 }
