@@ -167,7 +167,7 @@ public class GPU {
     private void SendDataBatch(){
         int counter = 0;
         while(counter < (capacity- processingDataBatch.size()) && indexUPDB<unProcessedDataBatch.length) {
-            System.out.println("sent from GPU, id:" + id);
+            //System.out.println("sent from GPU, id:" + id);
             Pair tempPair = new  <DataBatch,Integer> Pair(unProcessedDataBatch[indexUPDB],id);
             cluster.ReceiveDataFromGpu(tempPair);
             indexUPDB++;
@@ -250,5 +250,9 @@ public class GPU {
 
     public boolean isFinishTrainModel() {
         return finishTrainModel;
+    }
+
+    public void setFinishTrainModel(boolean finishTrainModel) {
+        this.finishTrainModel = finishTrainModel;
     }
 }

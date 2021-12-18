@@ -40,7 +40,7 @@
 
 }
 ],
-"GPUS": ["RTX3090"],
+"GPUS": ["RTX3090","GTX1080", "RTX2080","RTX3090","GTX1080"],
 "CPUS": [32,16,8],
 "Conferences":
 [
