@@ -36,7 +36,7 @@ public class CPU {
      * @post ths.ready = false;
      */
     public synchronized void ReceiveUnProcessedData(Pair<DataBatch,Integer> databatchPair){
-        System.out.println("received from Gpu, id:" + databatchPair.getSecond());
+        //System.out.println("received from Gpu, id:" + databatchPair.getSecond());
         if(ready) {
             this.databatchPair = databatchPair;
             ready = false;

@@ -1,16 +1,10 @@
 package bgu.spl.mics.application.services;
 
-import bgu.spl.mics.Future;
-import bgu.spl.mics.MessageBus;
-import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.*;
 import bgu.spl.mics.application.objects.Model;
 import bgu.spl.mics.application.objects.Pair;
 import bgu.spl.mics.application.objects.Student;
-
-import java.util.Iterator;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Student is responsible for sending the {@link TrainModelEvent},
@@ -35,8 +29,8 @@ public class StudentService extends MicroService {
     protected void initialize() {
         subscribeBroadcast(PublishConferenceBroadcast.class, this::PublishConferenceBroadcast);
         subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast)->{terminate();});
-        subscribeBroadcast(TrainedBroadcast.class, (TrainedBroadcast)->sentToTest(TrainedBroadcast.getModel()));
-        subscribeBroadcast(TestedBroadcast.class, (TestedBroadcast)->sentToPublish(TestedBroadcast.getModel()));
+        subscribeBroadcast(TrainedBroadcast.class, (TrainedBroadcast)-> sendToTest(TrainedBroadcast.getModel()));
+        subscribeBroadcast(TestedBroadcast.class, (TestedBroadcast)-> sendToPublish(TestedBroadcast.getModel()));
         act();
     }
 
@@ -52,10 +46,11 @@ public class StudentService extends MicroService {
 
     private boolean checkIfMyModel(Model m)
     {
+        System.out.println("Model " + m.getName() + " in " + student.getId() + " : " + student.getModels().contains(m));
         return student.getModels().contains(m);
     }
 
-    private void sentToTest(Model model){
+    private void sendToTest(Model model){
         if(checkIfMyModel(model)){
             student.getTrainedModels().add(model);
             System.out.println("student id:" + student.getId() + ", sentToTest with model name:" + model.getName());
@@ -64,13 +59,14 @@ public class StudentService extends MicroService {
         }
     }
 
-    private void sentToPublish(Model model){
+    private void sendToPublish(Model model){
         if(checkIfMyModel(model)) {
             act();
             if(model.getResultString()=="Good")
                 PublishResults(model);
         }
     }
+
 
     private void PublishResults(Model model){
         if(model != null){

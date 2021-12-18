@@ -34,7 +34,7 @@ public class CRMSRunner {
         //todo valid input?
         try {
             Gson gson = new Gson();
-            Reader reader = Files.newBufferedReader(Paths.get("example_input.json"));
+            Reader reader = Files.newBufferedReader(Paths.get("simple.json"));
             Map<?, ?> map = gson.fromJson(reader, Map.class);
             for (Map.Entry<?, ?> entry : map.entrySet()) {
                 if (entry.getKey().equals("Students"))  students = entry.getValue().toString();
