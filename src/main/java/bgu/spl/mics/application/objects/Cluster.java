@@ -45,7 +45,7 @@ public class Cluster {
 	public void ReceiveDataFromCpu(Pair<DataBatch,Integer> dataBatchPair, int cpuID){
 		GPU tempGPU= GPUs.get(dataBatchPair.getSecond());
 		statistics.AddNumberOfDataBatchProcessedByCpu();
-		System.out.println("received from CPU, id:" + cpuID);
+		//System.out.println("received from CPU, id:" + cpuID);
 		tempGPU.ReceiveProcessedData(dataBatchPair.getFirst());
 		CPU c = CPUs.get(cpuID);
 		synchronized (CpuLine) {
