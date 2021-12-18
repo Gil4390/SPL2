@@ -40,11 +40,10 @@ public class GPU {
     public GPU(String type,Cluster cluster, int id){
         this.type=FromStringToType(type);
         this.id = id;
-        switch(type){
-            case "GTX1080": {capacity = 8; trainingTime=4;}
-            case "RTX2080": {capacity = 16; trainingTime=2;}
-            case "RTX3090": {capacity = 32; trainingTime=1;}
-        }
+        if(this.type == Type.GTX1080) capacity = 8; trainingTime=4;
+        if(this.type == Type.RTX2080) capacity = 16; trainingTime=2;
+        if(this.type == Type.RTX3090) capacity = 32; trainingTime=1;
+
         processingDataBatch= new LinkedList<Pair<DataBatch,Integer>>();
         this.cluster = cluster;
         countPDB=0;
@@ -52,10 +51,10 @@ public class GPU {
         indexUPDB = 0;
         timeClock=0;
 
-        GPUService gpuService = new GPUService(this);
         ready=true;
         finishTrainModel=false;
     }
+
 
     /**
      * represent a tick for the cpu.
