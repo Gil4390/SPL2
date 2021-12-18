@@ -65,9 +65,9 @@ public class GPU {
     public void tick(){
         timeClock++;//todo atomic
         if(!ready) {
+            cluster.getStatistics().AddGpu_TimeUsed();
             TrainModel();
             SendDataBatch();
-            cluster.getStatistics().AddGpu_TimeUsed();
             if (unProcessedDataBatch!=null && countPDB == unProcessedDataBatch.length & countPDB != 0) {
                 cluster.finishTrainModel(model.getName());
                 finishTrainModel = true;
