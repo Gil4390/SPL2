@@ -8,6 +8,8 @@ import bgu.spl.mics.application.services.TimeService;
 
 import javax.swing.text.html.HTMLDocument;
 import java.util.*;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * The {@link MessageBusImpl class is the implementation of the MessageBus interface.
@@ -17,18 +19,22 @@ import java.util.*;
 public class MessageBusImpl implements MessageBus {
 
 	private HashMap<Class<? extends Message>, Queue<MicroService>> event_subscribe; // string = type event
+	private ReadWriteLock eventLock;
 	private HashMap<Class<? extends Message>, LinkedList<MicroService>> Broadcast_subscribe;
-
+	private ReadWriteLock broadcastLock;
 	private HashMap<String, Queue<Message>> microService_queues; // string = microservice name
+
 
 	private MessageBusImpl() {
 		event_subscribe = new HashMap<>();
 		Broadcast_subscribe= new HashMap<>();
 		microService_queues = new HashMap<>();
+		eventLock = new ReentrantReadWriteLock();
+		broadcastLock = new ReentrantReadWriteLock();
 		Initialize();
 	}
 
-	private void Initialize(){
+	private synchronized void Initialize(){
 		this.Broadcast_subscribe.put(TickBroadcast.class, new LinkedList<>());
 		this.Broadcast_subscribe.put(TerminateBroadcast.class, new LinkedList<>());
 		this.Broadcast_subscribe.put(PublishConferenceBroadcast.class, new LinkedList<>());
@@ -54,8 +60,10 @@ public class MessageBusImpl implements MessageBus {
 	 * @post this.isSubscribed(m,type) == true;
 	 */
 	@Override
-	public synchronized <T> void  subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
+	public   <T> void  subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
+		eventLock.writeLock().lock();
 		event_subscribe.get(type).add(m);
+		eventLock.writeLock().unlock();
 	}
 
 	/**
@@ -63,8 +71,10 @@ public class MessageBusImpl implements MessageBus {
 	 * @post this.isSubscribed(m,type) == true;
 	 */
 	@Override
-	public synchronized void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
+	public  void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
+		broadcastLock.writeLock().lock();
 		Broadcast_subscribe.get(type).add(m);
+		broadcastLock.writeLock().unlock();
 	}
 
 	/**
@@ -73,7 +83,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @post result = e.future.get();
 	 */
 	@Override
-	public synchronized <T> void complete(Event<T> e, T result) {
+	public  <T> void complete(Event<T> e, T result) {
 		e.getFuture().resolve(result);//todo need to understand what to to here
 	}
 
@@ -83,9 +93,13 @@ public class MessageBusImpl implements MessageBus {
 	 */
 	@Override
 	public synchronized void sendBroadcast(Broadcast b) {
+		broadcastLock.readLock().lock();
 		LinkedList<MicroService> list = Broadcast_subscribe.get(b.getClass());
+		broadcastLock.readLock().unlock();
 		for (MicroService m:list) {
-			microService_queues.get(m.getName()).add(b);
+			synchronized (microService_queues.get(m.getName())) {
+				microService_queues.get(m.getName()).add(b);
+			}
 		}
 		notifyAll();
 	}
@@ -95,13 +109,19 @@ public class MessageBusImpl implements MessageBus {
 	 * @post none
 	 */
 	@Override
-	public synchronized <T> Future<T> sendEvent(Event<T> e) {
+	public  <T> Future<T> sendEvent(Event<T> e) {
+		eventLock.readLock().lock();
 		Queue<MicroService> queue = event_subscribe.get(e.getClass());
+		eventLock.readLock().unlock();
 		if(!queue.isEmpty()) {
-			MicroService m = queue.poll();
-			microService_queues.get(m.getName()).add(e);
-			queue.add(m);
-			notifyAll();
+			synchronized (queue) {
+				MicroService m = queue.poll();
+				synchronized (microService_queues.get(m.getName())) {
+					microService_queues.get(m.getName()).add(e);
+				}
+				queue.add(m);
+			}
+			this.notifyAll();
 		}
 		return e.getFuture();
 	}
@@ -111,7 +131,7 @@ public class MessageBusImpl implements MessageBus {
 	 * @post this.isRegistered(m) == true;
 	 */
 	@Override
-	public synchronized void register(MicroService m) {
+	public  void register(MicroService m) {// todo check if we need here sync
 		microService_queues.put(m.getName(),new LinkedList<>());
 	}
 
@@ -119,7 +139,8 @@ public class MessageBusImpl implements MessageBus {
 	 * @post this.isRegistered(m) == false;
 	 */
 	@Override
-	public synchronized void unregister(MicroService m) {
+	public  void unregister(MicroService m) {
+		eventLock.writeLock().lock();
 		for (Queue<MicroService> queue:event_subscribe.values()) {
 			for(int i=0; i<queue.size();i++){
 				MicroService temp = queue.poll();
@@ -127,10 +148,15 @@ public class MessageBusImpl implements MessageBus {
 					queue.add(temp);
 			}
 		}
+		eventLock.writeLock().unlock();
+		broadcastLock.writeLock().lock();
 		for (LinkedList<MicroService> list:Broadcast_subscribe.values()) {
 			list.removeIf(temp -> temp.getName() == m.getName());
 		}
-		microService_queues.remove(m.getName());
+		broadcastLock.writeLock().unlock();
+		synchronized (microService_queues) {
+			microService_queues.remove(m.getName());
+		}
 	}
 
 	/**
@@ -139,12 +165,15 @@ public class MessageBusImpl implements MessageBus {
 	 */
 	@Override
 	public synchronized Message awaitMessage(MicroService m) throws InterruptedException {
-		if(!isRegistered(m))
-			throw new IllegalArgumentException();
+		synchronized (microService_queues) {
+			if (!isRegistered(m))
+				throw new IllegalArgumentException();
+		}
 		while(microService_queues.get(m.getName()).isEmpty())//todo better wait
-			wait();
-
+			this.wait();
+		synchronized (microService_queues.get(m.getName())) {
 		return microService_queues.get(m.getName()).poll();
+		}
 	}
 
 	/**
@@ -154,8 +183,11 @@ public class MessageBusImpl implements MessageBus {
 	 * @param s the MicroService
 	 * @param m the Message
 	 */
-	public synchronized boolean isSubscribed(MicroService s, Message m){
-		return Broadcast_subscribe.get(m).contains((s.getName()));
+	public boolean isSubscribed(MicroService s, Message m){
+		broadcastLock.readLock().lock();
+		boolean result= Broadcast_subscribe.get(m).contains((s.getName()));
+		broadcastLock.readLock().unlock();
+		return result;
 	}
 
 	/**
@@ -164,19 +196,8 @@ public class MessageBusImpl implements MessageBus {
 	 * @return true if already registered or false
 	 * @param s the MicroService
 	 */
-	public synchronized boolean isRegistered(MicroService s){
+	public boolean isRegistered(MicroService s){
 		return microService_queues.containsKey((s.getName()));
 	}
 
-//	public HashMap<Class<? extends Message>, Queue<MicroService>> getEvent_subscribe() {
-//		return event_subscribe;
-//	}
-//
-//	public HashMap<Class<? extends Message>, LinkedList<MicroService>> getBroadcast_subscribe() {
-//		return Broadcast_subscribe;
-//	}
-
-	public synchronized HashMap<String, Queue<Message>> getMicroService_queues() {
-		return microService_queues;
-	}
 }

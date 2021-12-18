@@ -65,9 +65,10 @@ public class StudentService extends MicroService {
     }
 
     private void sentToPublish(Model model){
-        if(checkIfMyModel(model) && model.getResultString()=="Good") {
+        if(checkIfMyModel(model)) {
             act();
-            PublishResults(model);
+            if(model.getResultString()=="Good")
+                PublishResults(model);
         }
     }
 

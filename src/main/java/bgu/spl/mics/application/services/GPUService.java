@@ -49,6 +49,7 @@ public class GPUService extends MicroService {
             if(gpu.isFinishTrainModel()) {
                 TrainedBroadcast event = new TrainedBroadcast(gpu.getModel());
                 sendBroadcast(event);
+                gpu.setFinishTrainModel(false);
             }
             nextEvent();
         }
