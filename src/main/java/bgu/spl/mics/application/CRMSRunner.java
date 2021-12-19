@@ -89,7 +89,7 @@ public class CRMSRunner {
         OutputJSON outputJSON = CreateOutputObject(STUDENTS, CONFERENCES, cluster);
         String jsonString = ConvertObjectToJSONString(outputJSON);
         System.out.println(jsonString);
-        //SaveJSONObject(outputJSON);
+        SaveJSONObject(outputJSON);
     }
 
 
