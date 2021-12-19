@@ -23,6 +23,11 @@ public class CRMSRunner {
     private static Vector<StudentService> StudentServices;
 
     public static void main(String[] args) {
+        if(args.length != 1){
+            System.out.println("no input file");
+        }
+        String inputFile = args[0];
+
         String students="";
         String gpus="";
         String cpus="";
@@ -34,7 +39,7 @@ public class CRMSRunner {
 
         try {
             Gson gson = new Gson();
-            Reader reader = Files.newBufferedReader(Paths.get("simple.json"));
+            Reader reader = Files.newBufferedReader(Paths.get(inputFile));
             Map<?, ?> map = gson.fromJson(reader, Map.class);
             for (Map.Entry<?, ?> entry : map.entrySet()) {
                 if (entry.getKey().equals("Students"))  students = entry.getValue().toString();

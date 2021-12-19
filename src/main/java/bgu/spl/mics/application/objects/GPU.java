@@ -40,9 +40,18 @@ public class GPU {
     public GPU(String type,Cluster cluster, int id){
         this.type=FromStringToType(type);
         this.id = id;
-        if(this.type == Type.GTX1080) capacity = 8; trainingTime=4;
-        if(this.type == Type.RTX2080) capacity = 16; trainingTime=2;
-        if(this.type == Type.RTX3090) capacity = 32; trainingTime=1;
+        if(this.type == Type.GTX1080) {
+            capacity = 8;
+            trainingTime=4;
+        }
+        if(this.type == Type.RTX2080){
+            capacity = 16;
+            trainingTime=2;
+        }
+        if(this.type == Type.RTX3090) {
+            capacity = 32;
+            trainingTime=1;
+        }
 
         processingDataBatch= new LinkedList<Pair<DataBatch,Integer>>();
         this.cluster = cluster;
@@ -64,7 +73,8 @@ public class GPU {
     public void tick(){
         timeClock++;
         if(!ready) {
-            cluster.getStatistics().AddGpu_TimeUsed();
+            if(!processingDataBatch.isEmpty())
+                cluster.getStatistics().AddGpu_TimeUsed();
             TrainModel();
             SendDataBatch();
             if (unProcessedDataBatch!=null && countPDB == unProcessedDataBatch.length & countPDB != 0) {
