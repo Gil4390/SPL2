@@ -1,6 +1,8 @@
 import bgu.spl.mics.Event;
 import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.objects.Cluster;
+import bgu.spl.mics.application.objects.GPU;
 import bgu.spl.mics.application.services.GPUService;
 import bgu.spl.mics.application.services.messages.ExampleBroadcast;
 import bgu.spl.mics.application.services.messages.ExampleEvent;
@@ -12,7 +14,7 @@ import java.util.Queue;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MessageBusImplTest {
-/*
+
     MessageBusImpl mBus;
     ExampleEvent e;
     MicroService m;
@@ -21,32 +23,35 @@ class MessageBusImplTest {
     void setUp() {
         mBus = MessageBusImpl.getInstance();
         e = new ExampleEvent("test");
-        m = new GPUService("gpu test1");
+        m = new GPUService(new GPU("GTX1080",Cluster.getInstance(),0));
         b = new ExampleBroadcast("1234");
     }
 
     @Test
     void subscribeEvent() {
-        Queue<MicroService> q = mBus.getEventsBroadcast_subscribe().get(e.getType());
-        MicroService result= null;
-        for (int i=0; i<q.size();i++) {
-            MicroService temp = q.remove();
-            q.add(temp);
-            if (m.getName() == temp.getName()) {
-                result=temp;
-            }
-        }
-        assertNull(result);
-        mBus.subscribeEvent(e.getClass() ,m);
-        result= null;
-        for (int i=0; i<q.size();i++) {
-            MicroService temp = q.remove();
-            q.add(temp);
-            if (m.getName() == temp.getName()) {
-                result=temp;
-            }
-        }
-        assertNotNull(result);
+        mBus.subscribeEvent(ExampleEvent.class,m);
+        assertEquals(1,mBus.);
+
+//        Queue<MicroService> q = mBus.getEventsBroadcast_subscribe().get(e.getType());
+//        MicroService result= null;
+//        for (int i=0; i<q.size();i++) {
+//            MicroService temp = q.remove();
+//            q.add(temp);
+//            if (m.getName() == temp.getName()) {
+//                result=temp;
+//            }
+//        }
+//        assertNull(result);
+//        mBus.subscribeEvent(e.getClass() ,m);
+//        result= null;
+//        for (int i=0; i<q.size();i++) {
+//            MicroService temp = q.remove();
+//            q.add(temp);
+//            if (m.getName() == temp.getName()) {
+//                result=temp;
+//            }
+//        }
+//        assertNotNull(result);
     }
 
     @Test
@@ -172,6 +177,4 @@ class MessageBusImplTest {
         mBus.unregister(m);
         assertFalse(mBus.isRegistered(m));
     }
-
- */
 }
