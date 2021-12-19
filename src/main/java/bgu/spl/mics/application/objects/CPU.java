@@ -41,10 +41,8 @@ public class CPU {
             this.databatchPair = databatchPair;
             endProcessedTime = processedTime.intValue() + (32 / cores) * databatchPair.getFirst().getProcessTime();
         }
-        else{
-            System.out.println("entered function ReceiveUnProcessedData when cpu ready was false, CPUID: " + this.id);
-        }
     }
+
 
     /**
      * represent a tick for the cpu.
@@ -60,7 +58,6 @@ public class CPU {
             val=processedTime.intValue();
         }while(!processedTime.compareAndSet(val,val+1));
         if(!ready) {
-            //System.out.println("Statistics: "+cluster.getStatistics().getCpu_TimeUsed());
             cluster.getStatistics().AddCpu_TimeUsed();
         }
         if(!ready & processedTime.intValue()==endProcessedTime){

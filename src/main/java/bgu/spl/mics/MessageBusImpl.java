@@ -16,6 +16,7 @@ public class MessageBusImpl implements MessageBus {
 	private final ReadWriteLock eventLock;
 	private final HashMap<Class<? extends Message>, LinkedList<MicroService>> Broadcast_subscribe;
 	private final ReadWriteLock broadcastLock;
+
 	private final HashMap<String, Queue<Message>> microService_queues; // string = microservice name
 
 	private MessageBusImpl() {
@@ -69,7 +70,6 @@ public class MessageBusImpl implements MessageBus {
 	}
 
 	/**
-	 * @pre e.result != null ;
 	 * @post e.future.isDone = true;
 	 * @post result = e.future.get();
 	 */
@@ -80,7 +80,7 @@ public class MessageBusImpl implements MessageBus {
 
 	/**
 	 * @pre none
-	 * @post none
+	 * @post Broadcast_subscribe.get(b).size = 0
 	 */
 	@Override
 	public void sendBroadcast(Broadcast b) {
@@ -97,7 +97,7 @@ public class MessageBusImpl implements MessageBus {
 
 	/**
 	 * @pre none
-	 * @post none
+	 * @post event_subscribe.get(e).size() = @pre event_subscribe.get(e).size()
 	 */
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
@@ -180,5 +180,17 @@ public class MessageBusImpl implements MessageBus {
 		synchronized (microService_queues) {
 			return microService_queues.containsKey((s.getName()));
 		}
+	}
+
+	public synchronized boolean isSubscribedBroadcast(MicroService s, Broadcast b){
+		return Broadcast_subscribe.get(b.getClass()).contains(s);
+	}
+
+	public synchronized boolean isSubscribedEvent(MicroService s, Event e){
+		return event_subscribe.get(e.getClass()).contains(s);
+	}
+
+	public HashMap<String, Queue<Message>> getMicroService_queues() {
+		return microService_queues;
 	}
 }

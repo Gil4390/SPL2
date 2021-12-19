@@ -1,11 +1,17 @@
 import bgu.spl.mics.Event;
 import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.messages.TerminateBroadcast;
+import bgu.spl.mics.application.messages.TickBroadcast;
+import bgu.spl.mics.application.messages.TrainModelEvent;
 import bgu.spl.mics.application.objects.Cluster;
+import bgu.spl.mics.application.objects.Data;
 import bgu.spl.mics.application.objects.GPU;
+import bgu.spl.mics.application.objects.Model;
 import bgu.spl.mics.application.services.GPUService;
 import bgu.spl.mics.application.services.messages.ExampleBroadcast;
 import bgu.spl.mics.application.services.messages.ExampleEvent;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,165 +22,110 @@ import static org.junit.jupiter.api.Assertions.*;
 class MessageBusImplTest {
 
     MessageBusImpl mBus;
-    ExampleEvent e;
+    TrainModelEvent e;
     MicroService m;
-    ExampleBroadcast  b;
+    TickBroadcast b;
     @BeforeEach
     void setUp() {
         mBus = MessageBusImpl.getInstance();
-        e = new ExampleEvent("test");
-        m = new GPUService(new GPU("GTX1080",Cluster.getInstance(),0));
-        b = new ExampleBroadcast("1234");
     }
 
     @Test
     void subscribeEvent() {
-        mBus.subscribeEvent(ExampleEvent.class,m);
-        assertEquals(1,mBus.);
-
-//        Queue<MicroService> q = mBus.getEventsBroadcast_subscribe().get(e.getType());
-//        MicroService result= null;
-//        for (int i=0; i<q.size();i++) {
-//            MicroService temp = q.remove();
-//            q.add(temp);
-//            if (m.getName() == temp.getName()) {
-//                result=temp;
-//            }
-//        }
-//        assertNull(result);
-//        mBus.subscribeEvent(e.getClass() ,m);
-//        result= null;
-//        for (int i=0; i<q.size();i++) {
-//            MicroService temp = q.remove();
-//            q.add(temp);
-//            if (m.getName() == temp.getName()) {
-//                result=temp;
-//            }
-//        }
-//        assertNotNull(result);
+        TrainModelEvent event = new TrainModelEvent(0,new Model("testModel",new Data("Text",2000),1));
+        MicroService m = new GPUService(new GPU("GTX1080",Cluster.getInstance(),0));
+        mBus.register(m);
+        assertFalse(mBus.isSubscribedEvent(m,event));
+        mBus.subscribeEvent(event.getClass(),m);
+        assertTrue(mBus.isSubscribedEvent(m,event));
     }
 
     @Test
     void subscribeBroadcast() {
-        Queue<MicroService> q = mBus.getEventsBroadcast_subscribe().get(b.getType());
-        MicroService result= null;
-        for (int i=0; i<q.size();i++) {
-            MicroService temp = q.remove();
-            q.add(temp);
-            if (m.getName() == temp.getName()) {
-                result=temp;
-            }
-        }
-        assertNull(result);
-
-        mBus.subscribeBroadcast(b.getClass() ,m);
-
-        result= null;
-        for (int i=0; i<q.size();i++) {
-            MicroService temp = q.remove();
-            q.add(temp);
-            if (m.getName() == temp.getName()) {
-                result=temp;
-            }
-        }
-        assertNotNull(result);
+        TickBroadcast tickB = new TickBroadcast();
+        MicroService k = new GPUService(new GPU("GTX1080",Cluster.getInstance(),1));
+        mBus.register(k);
+        assertFalse(mBus.isSubscribedBroadcast(k,tickB));
+        mBus.subscribeBroadcast(tickB.getClass(),k);
+        assertTrue(mBus.isSubscribedBroadcast(k,tickB));
     }
 
     @Test
     void complete() {
-        assertFalse(e.getFuture().isDone());
-        mBus.complete(e,"result done");
+        Model model = new Model("testModel",new Data("Text",2000),1);
+        TrainModelEvent e = new TrainModelEvent(0,new Model("testModel",new Data("Text",2000),1));
+        mBus.complete(e,model);
         assertTrue(e.getFuture().isDone());
-        assertTrue(e.getFuture().get()=="result done");
+        assertEquals(e.getFuture().get(),model);
     }
 
-    @Test
-    void sendBroadcast() {
-        mBus.register(m);
-        mBus.subscribeBroadcast(b.getClass(),m);
-        Queue <MicroService> q = mBus.getEventsBroadcast_subscribe().get(b.getType());
-        MicroService temp = q.peek();
-        Queue temp2 = mBus.getMicroService_queues().get(temp.getName());
-        assertEquals(0,temp2.size());
-        mBus.sendBroadcast(b);
-        assertEquals(1,temp2.size());
-    }
-
-    @Test
-    void sendEvent() {
-        mBus.register(m);
-        mBus.subscribeEvent(e.getClass(),m);
-        Queue <MicroService> q = mBus.getEventsBroadcast_subscribe().get(b.getType());
-        MicroService temp = q.peek();
-        Queue temp2 = mBus.getMicroService_queues().get(temp.getName());
-        assertEquals(0,temp2.size());
-        mBus.sendEvent(e);
-        assertEquals(1,temp2.size());
-    }
+//    @Test
+//    void sendBroadcast() {
+//        TerminateBroadcast ter = new TerminateBroadcast();
+//        MicroService mic = new GPUService(new GPU("GTX1080",Cluster.getInstance(),6));
+//        mBus.register(mic);
+//        mBus.subscribeBroadcast(ter.getClass(),mic);
+//        mBus.sendBroadcast(ter);
+//        assertEquals( mBus.getMicroService_queues().get(mic).size(),1);
+//    }
+//
+//    @Test
+//    void sendEvent() {
+//        mBus.register(m);
+//        mBus.subscribeEvent(e.getClass(),m);
+//        mBus.sendEvent(e);
+//        assertEquals(mBus.getMicroService_queues().get(m).size(),1);
+//    }
 
     @Test
     void register() {
-        Queue<Event> q = mBus.getMicroService_queues().get(m.getName());
-        assertNull(q);
-        mBus.register(m);
-        q = mBus.getMicroService_queues().get(m.getName());
-        assertNotNull(q);
+        MicroService mic = new GPUService(new GPU("GTX1080",Cluster.getInstance(),6));
+        assertFalse(mBus.isRegistered(mic));
+        mBus.register(mic);
+        assertTrue(mBus.isRegistered(mic));
     }
 
     @Test
     void unregister() {
-        mBus.unregister(m);
-        assertNull(mBus.getMicroService_queues().get(m.getName()));
+        MicroService mic2 = new GPUService(new GPU("GTX1080",Cluster.getInstance(),6));
+        mBus.register(mic2);
+        assertTrue(mBus.isRegistered(mic2));
+        mBus.unregister(mic2);
+        assertFalse(mBus.isRegistered(mic2));
     }
 
-    @Test
-    void awaitMessage() {
-        try{
-            mBus.awaitMessage(m);
-            assertTrue(false);
-        }
-        catch (Exception e){
-            assertTrue(e.equals(new InterruptedException()));
-        }
-
-        mBus.register(m);
-        Thread t = new Thread(){
-            public void run(){
-                try{
-                    mBus.awaitMessage(m);
-                }
-                catch (Exception e){
-                    assertTrue(false);
-                }
-            }
-        };
-        t.run();
-
-        try {
-            Thread.sleep(1000);
-            assertEquals(t.getState(),Thread.State.WAITING);
-            mBus.subscribeEvent(e.getClass(),m);
-            mBus.sendEvent(e);
-            Thread.sleep(10);
-            assertNotEquals(t.getState(),Thread.State.WAITING);
-        }
-        catch (Exception e){
-        }
-    }
-
-    @Test
-    void isSubscribed() {
-        assertFalse(mBus.isSubscribed(m,e));
-        mBus.subscribeEvent(e.getClass(),m);
-        assertTrue(mBus.isSubscribed(m,e));
-    }
-
-    @Test
-    void isRegistered() {
-        assertFalse(mBus.isRegistered(m));
-        mBus.register(m);
-        assertTrue(mBus.isRegistered(m));
-        mBus.unregister(m);
-        assertFalse(mBus.isRegistered(m));
-    }
+//    @Test
+//    void awaitMessage() {
+//        try{
+//            mBus.awaitMessage(m);
+//            assertTrue(false);
+//        }
+//        catch (Exception e){
+//            assertTrue(e.equals(new InterruptedException()));
+//        }
+//
+//        mBus.register(m);
+//        Thread t = new Thread(){
+//            public void run(){
+//                try{
+//                    mBus.awaitMessage(m);
+//                }
+//                catch (Exception e){
+//                    assertTrue(false);
+//                }
+//            }
+//        };
+//        t.run();
+//
+//        try {
+//            Thread.sleep(1000);
+//            assertEquals(t.getState(),Thread.State.WAITING);
+//            mBus.subscribeEvent(e.getClass(),m);
+//            mBus.sendEvent(e);
+//            Thread.sleep(10);
+//            assertNotEquals(t.getState(),Thread.State.WAITING);
+//        }
+//        catch (Exception e){
+//        }
+//    }
 }

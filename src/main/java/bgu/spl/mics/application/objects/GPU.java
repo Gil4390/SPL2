@@ -89,7 +89,16 @@ public class GPU {
             }
         }
     }
-
+    /**
+     * this function trains the process data the gpu holds
+     * <p>
+     * @pre this.ready == false
+     * @pre processingDataBatch.isEmpty() != true;
+     * @post processingDataBatch.size <= @pre(processingDataBatch.size)
+     * @post countPDB >= @pre(countPDB)
+     * @post this.model.Status = Training
+     * @post finishTrainModel = false
+     */
     public void TrainModelEvent(Model m){
         ready=false;
         finishTrainModel=false;
@@ -98,6 +107,15 @@ public class GPU {
         DivideDataBatch();
     }
 
+    /**
+     * this function tests the model received
+     * <p>
+     * @pre m.Status = Trained
+     * @pre this.ready = true
+     * @post this.model = m
+     * @post this.model.Status = Tested
+     * @post finishTrainModel = false
+     */
     public void TestModel(Model m){
         ready = false;
         finishTrainModel=false;
@@ -132,21 +150,19 @@ public class GPU {
     }
 
     /**
-     * this function resat the gpu for a new model
+     * this function preperes the gpu for a new model
      * <p>
      * @pre this.model != null
-     * @pre this.ready == false
-     * @pre countPDB ==  indexUPDB
-     * @pre processingDataBatch.isEmpty() == true;
-     * @post this.ready == true
-     * @post this.model == null
-     * @post this.unProcessedDataBatch == null
-     * @post this.indexUPDB == 0
-     * @post this.countPDB ==0
-     * @post this.trainingTime =0;
+     * @pre this.ready = false
+     * @pre countPDB =  indexUPDB
+     * @pre processingDataBatch.isEmpty() = true;
+     * @post this.ready = true
+     * @post this.unProcessedDataBatch = null
+     * @post this.indexUPDB = 0
+     * @post this.countPDB = 0
+     * @post this.trainingTime =0 ;
      */
     private void Finish(){
-        //model=null;
         countPDB=0;
         indexUPDB=0;
         trainingTime=0;
@@ -174,7 +190,7 @@ public class GPU {
     }
 
     /**
-     * if left a data's batch's un processed, sent it to cluster if the gpu have a place to store it when comes back.
+     * if there's a databath that is unprocessed only send it to cluster if the gpu have a place to store it when comes back.
      * <p>
      * @pre this.model != null
      * @pre this.ready == false
@@ -187,7 +203,6 @@ public class GPU {
             cluster.ReceiveDataFromGpu(tempPair);
             indexUPDB++;
             countDataBatchToSend--;
-            //System.out.println("send data");
         }
     }
 
@@ -197,13 +212,11 @@ public class GPU {
      * <p>
      * @pre this.model != null
      * @pre this.ready == false
-     * @post this.countPDB > @pre(countPDB)
      */
     public void ReceiveProcessedData(DataBatch databatch){
         synchronized (processingDataBatch) {
             processingDataBatch.add(new Pair<DataBatch, Integer>(databatch, timeClock));
             countDataBatchToSend++;
-            //System.out.println("receive data");
         }
     }
 

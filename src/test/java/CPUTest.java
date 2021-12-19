@@ -46,7 +46,5 @@ class CPUTest {
         else{
             assertFalse(cpu.isReady());
         }
-
-
     }
 }

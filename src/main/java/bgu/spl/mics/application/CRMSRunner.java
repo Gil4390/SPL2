@@ -40,7 +40,7 @@ public class CRMSRunner {
 
         try {
             Gson gson = new Gson();
-            Reader reader = Files.newBufferedReader(Paths.get("simple.json"));
+            Reader reader = Files.newBufferedReader(Paths.get("example_input.json"));
             Map<?, ?> map = gson.fromJson(reader, Map.class);
             for (Map.Entry<?, ?> entry : map.entrySet()) {
                 if (entry.getKey().equals("Students"))  students = entry.getValue().toString();
@@ -81,8 +81,6 @@ public class CRMSRunner {
         }
 
         TimeService timeService = new TimeService(TICK_TIME, DURATION);
-        //Thread timeThread = new Thread(timeService);
-        //timeThread.start();
         timeService.run();
 
 
@@ -90,7 +88,7 @@ public class CRMSRunner {
         OutputJSON outputJSON = CreateOutputObject(STUDENTS, CONFERENCES, cluster);
         String jsonString = ConvertObjectToJSONString(outputJSON);
         System.out.println(jsonString);
-        //SaveJSONObject(outputJSON);
+        SaveJSONObject(outputJSON);
     }
 
 

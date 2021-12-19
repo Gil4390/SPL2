@@ -36,13 +36,11 @@ public class StudentService extends MicroService {
     public void act(){
         for (Model model:student.getModels()) {
             TrainModelEvent trainEvent = new TrainModelEvent(this.student.getId(), model);
-            System.out.println("student id:"+ student.getId()+" ,sent the model: "+model.getName()+" to train");
             trainEvent.setFuture(sendEvent(trainEvent));
             model =trainEvent.getFuture().get();
             if(model != null ) {
                 student.getTrainedModels().add(model);
                 TestModelEvent testEvent = new TestModelEvent(this.student.getId(), model);
-                System.out.println("student id:"+ student.getId()+" ,sent the model: "+model.getName()+" to test");
                 Future<Boolean> f = sendEvent(testEvent);
                 if(f.get() != null) {
                     if (testEvent.getFuture().get()) {
