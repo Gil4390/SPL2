@@ -19,7 +19,6 @@ class FutureTest {
 
     @Test
     void get() {
-        assertNull(f.get());
         String str = "a";
         f.resolve(str);
         assertEquals(f.get(),str);
@@ -27,7 +26,6 @@ class FutureTest {
 
     @Test
     void resolve() {
-        assertNull(f.get());
         assertFalse(f.isDone());
         String str = "a";
         f.resolve(str);
@@ -45,34 +43,25 @@ class FutureTest {
 
     @Test
     void get2() {
-        long Timeout = 3000;
+        long Timeout = 1500;
         TimeUnit unit = TimeUnit.MILLISECONDS;
 
         assertNull(f.get(Timeout,unit));
+
         Thread k = new Thread(){
             public void run() {
                 assertEquals("test",f.get(Timeout,unit));
             }
         };
-        Thread t = new Thread() {
-            public void run() {
-                try {
-                    unit.sleep(Timeout / 2);
-                } catch (
-                        InterruptedException e) {
-                }
-                f.resolve("test");
-            }
-        };
-        k.run();
-        t.run();
+        k.start();
+        f.resolve("test");
 
-        f=new Future<String>();
-        k = new Thread(){
+        Future fu=new Future<String>();
+        Thread d = new Thread(){
             public void run() {
-                assertNull(f.get(Timeout,unit));
+                assertNull(fu.get(Timeout,unit));
             }
         };
-        k.run();
+        d.run();
     }
 }

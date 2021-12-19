@@ -59,8 +59,10 @@ public class CPU {
         do{
             val=processedTime.intValue();
         }while(!processedTime.compareAndSet(val,val+1));
-        if(!ready)
+        if(!ready) {
+            //System.out.println("Statistics: "+cluster.getStatistics().getCpu_TimeUsed());
             cluster.getStatistics().AddCpu_TimeUsed();
+        }
         if(!ready & processedTime.intValue()==endProcessedTime){
             endProcessedTime=0;
             ready=true;
@@ -78,7 +80,11 @@ public class CPU {
     /**
      * @return the databatch
      */
-    public DataBatch getDataBatch(){return databatchPair.getFirst();};
+    public DataBatch getDataBatch(){
+        if(databatchPair == null)
+            return null;
+        return databatchPair.getFirst();
+    };
 
     /**
      * @return the processedTime, the amount of ticks that the cpu received

@@ -30,7 +30,10 @@ public class GPU {
 
     private int indexUPDB;
     private int countPDB;
+
     private int capacity;
+
+    private int countDataBatchToSend;
     private int timeClock;
     private int trainingTime;
 
@@ -62,6 +65,7 @@ public class GPU {
 
         ready=true;
         finishTrainModel=false;
+        countDataBatchToSend=capacity;
     }
 
 
@@ -160,6 +164,8 @@ public class GPU {
      */
     private void DivideDataBatch(){
         int size =model.getData().getSize()/1000;
+        if(model.getData().getSize()%1000!=0)
+            size++;
         unProcessedDataBatch = new DataBatch[size];
         for(int i=0; i<size;i++){
             DataBatch data = new DataBatch(i*1000,model.getData());
@@ -176,14 +182,15 @@ public class GPU {
      * @post this.indexUPDB = @pre(indexUPDB)+1
      */
     private void SendDataBatch(){
-        int counter = 0;
-        while(counter < (capacity- processingDataBatch.size()) && indexUPDB<unProcessedDataBatch.length) {
+        while(countDataBatchToSend>0 && indexUPDB<unProcessedDataBatch.length) {
             Pair tempPair = new  <DataBatch,Integer> Pair(unProcessedDataBatch[indexUPDB],id);
             cluster.ReceiveDataFromGpu(tempPair);
             indexUPDB++;
-            counter++;
+            countDataBatchToSend--;
+            //System.out.println("send data");
         }
     }
+
 
     /**
      * this function receives a process data and store it
@@ -195,6 +202,8 @@ public class GPU {
     public void ReceiveProcessedData(DataBatch databatch){
         synchronized (processingDataBatch) {
             processingDataBatch.add(new Pair<DataBatch, Integer>(databatch, timeClock));
+            countDataBatchToSend++;
+            //System.out.println("receive data");
         }
     }
 
@@ -238,5 +247,37 @@ public class GPU {
 
     public void setFinishTrainModel(boolean finishTrainModel) {
         this.finishTrainModel = finishTrainModel;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public Queue<Pair<DataBatch, Integer>> getProcessingDataBatch() {
+        return processingDataBatch;
+    }
+
+    public DataBatch[] getUnProcessedDataBatch() {
+        return unProcessedDataBatch;
+    }
+
+    public int getIndexUPDB() {
+        return indexUPDB;
+    }
+
+    public int getCountPDB() {
+        return countPDB;
+    }
+
+    public int getTimeClock() {
+        return timeClock;
+    }
+
+    public int getTrainingTime() {
+        return trainingTime;
+    }
+
+    public int getCountDataBatchToSend() {
+        return countDataBatchToSend;
     }
 }

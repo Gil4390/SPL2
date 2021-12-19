@@ -18,7 +18,9 @@ class CPUTest {
         assertNull(cpu.getDataBatch());
         Data d = new Data("Text",7800);
         DataBatch data = new DataBatch(0,d);
-        cpu.ReceiveUnProcessedData(new <DataBatch ,String> Pair(data," "));
+        assertEquals(0,cpu.getEndProcessedTime());
+        cpu.ReceiveUnProcessedData(new <DataBatch ,Integer> Pair(data,0));
+        assertEquals(8,cpu.getEndProcessedTime());
         assertEquals(cpu.getDataBatch(), data);
     }
 
@@ -34,16 +36,15 @@ class CPUTest {
         assertTrue(cpu.isReady());
         assertNull(cpu.getDataBatch());
         assertEquals(0, cpu.getEndProcessedTime());
-
     }
 
     @Test
     void isReady() {
         if(cpu.getDataBatch()== null){
-            assertFalse(cpu.isReady());
+            assertTrue(cpu.isReady());
         }
         else{
-            assertTrue(cpu.isReady());
+            assertFalse(cpu.isReady());
         }
 
 
